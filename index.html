@@ -15,7 +15,6 @@
             background-color: #f4f6f9;
             color: #333;
         }
-        /* الشريط العلوي الرسمي */
         header {
             background-color: #0b2545;
             color: #fff;
@@ -31,11 +30,9 @@
             gap: 15px;
         }
         .logo-area h1 {
-            font-size: 20px;
+            font-size: 19px;
             font-weight: bold;
-            letter-spacing: 0.5px;
         }
-        /* شعار الجامعة البديل لدائرة الحرف */
         .university-logo {
             width: 48px;
             height: 48px;
@@ -44,17 +41,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             border: 2px solid #ee6c4d;
-            overflow: hidden;
         }
-        .university-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        /* القائمة الرئيسية */
         nav {
             display: flex;
             align-items: center;
@@ -69,8 +57,7 @@
         nav a:hover {
             color: #8da9c4;
         }
-
-        /* القائمة المنسدلة للوحات (أعلى اليسار) */
+        /* القائمة المنسدلة لبوابات النظام */
         .dropdown {
             position: relative;
             display: inline-block;
@@ -87,10 +74,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            transition: background 0.3s;
-        }
-        .dropbtn:hover {
-            background-color: #1d5f9c;
         }
         .dropdown-content {
             display: none;
@@ -98,11 +81,10 @@
             left: 0;
             background-color: #ffffff;
             min-width: 230px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            z-index: 10;
             border-radius: 4px;
             overflow: hidden;
-            border: 1px solid #dcdcdc;
         }
         .dropdown-content a {
             color: #333;
@@ -111,7 +93,6 @@
             display: block;
             font-size: 14px;
             border-bottom: 1px solid #f1f1f1;
-            transition: background 0.2s;
         }
         .dropdown-content a:hover {
             background-color: #f8f9fa;
@@ -121,27 +102,24 @@
             display: block;
         }
 
-        /* المحتوى الرئيسي للواجهة */
         .hero {
             background: linear-gradient(rgba(11, 37, 69, 0.85), rgba(11, 37, 69, 0.85)), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80') center/cover;
             color: white;
             text-align: center;
-            padding: 110px 20px;
+            padding: 100px 20px;
         }
         .hero h2 {
-            font-size: 34px;
+            font-size: 32px;
             margin-bottom: 15px;
-            font-weight: bold;
         }
         .hero p {
-            font-size: 18px;
+            font-size: 17px;
             max-width: 750px;
             margin: 0 auto;
-            line-height: 1.6;
             color: #e2e8f0;
+            line-height: 1.6;
         }
 
-        /* قسم الرؤية والأقسام */
         .container {
             max-width: 1100px;
             margin: 40px auto;
@@ -157,13 +135,37 @@
         }
         .section-box h3 {
             color: #0b2545;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
             font-size: 22px;
         }
-        .section-box p {
-            color: #555;
-            line-height: 1.7;
-            font-size: 15px;
+        .list-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .list-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            font-weight: bold;
+            color: #134074;
+        }
+
+        /* قسم الأخبار */
+        .news-card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 6px;
+            border-left: 4px solid #ee6c4d;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .news-date {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
         }
 
         footer {
@@ -178,56 +180,78 @@
 </head>
 <body>
 
-    <!-- الشريط العلوي الرسمي -->
     <header>
         <div class="logo-area">
             <div class="university-logo">
-                <!-- شعار الجامعة الرمزي -->
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="#0b2545"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="#0b2545"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
             </div>
             <h1>جامعة المنارة العلمية الأهلية</h1>
         </div>
         
         <nav>
             <a href="#">الرئيسية</a>
-            <a href="#vision">الرؤية</a>
+            <a href="#news">الأخـبار</a>
             <a href="#departments">الأقسام</a>
             <a href="#administrations">الإدارات</a>
         </nav>
 
-        <!-- قائمة منسدلة في أعلى اليسار تضم اللوحات المطلوبة -->
         <div class="dropdown">
             <button class="dropbtn">بوابات النظام ▾</button>
             <div class="dropdown-content">
-                <a href="#student-portal">لوحة الطلبة</a>
-                <a href="#employee-portal">لوحة الموظفين</a>
-                <a href="#admin-portal">لوحة الإدارة</a>
-                <a href="#faculty-portal">لوحة أعضاء هيئة التدريس</a>
+                <a href="#student-portal">لوحة الطلبة (رقم القيد)</a>
+                <a href="#employee-portal">لوحة الموظفين (الرقم الوظيفي)</a>
+                <a href="#faculty-portal">لوحة أعضاء هيئة التدريس (رقم العضوية)</a>
+                <a href="#admin-portal">لوحة الإدارة (اسم المستخدم والرقم السري)</a>
             </div>
         </div>
     </header>
 
-    <!-- الواجهة الرئيسية بالنصوص الجديدة -->
     <section class="hero">
         <h2>مرحبا بكم في جامعة المنارة العلمية الاهلية</h2>
         <p>صرحٌ علمي يرسّخ المعرفة، ويصنع الكفاءات، ويسهم في بناء مستقبلٍ أفضل.</p>
     </section>
 
     <div class="container">
-        <div id="vision" class="section-box">
-            <h3>رؤية الجامعة</h3>
-            <p>الريادة والتميز في التعليم العالي، البحث العلمي، وخدمة المجتمع، وتوفير بيئة أكاديمية محفزة للإبداع والابتكار بما يلبي احتياجات سوق العمل والتنمية المستدامة.</p>
+        
+        <!-- قسم الأخبار والإعلانات -->
+        <div id="news" class="section-box">
+            <h3>آخر الأخبار والإعلانات الرسمية</h3>
+            <div class="news-card">
+                <div class="news-date">26 سبتمبر 2026</div>
+                <h4>انطلاق تسجيل الفصل الدراسي الجديد</h4>
+                <p>تعلن إدارة الجامعة عن بدء استقبال طلبات التسجيل للطلبة的新ين والقدامى عبر بوابات النظام الإلكترونية.</p>
+            </div>
+            <div class="news-card">
+                <div class="news-date">24 سبتمبر 2026</div>
+                <h4>اعتماد الجدول الدراسي العام</h4>
+                <p>تم اعتماد الجداول الدراسية لكافة الأقسام العلمية، ويمكن لأعضاء هيئة التدريس والطلبة متابعتها.</p>
+            </div>
         </div>
 
+        <!-- الأقسام العلمية المحدثة -->
         <div id="departments" class="section-box">
             <h3>الأقسام العلمية</h3>
-            <p>تضم الجامعة نخبة من الأقسام الأكاديمية في مجالات العلوم الاقتصادية، المالية، الإدارية، الهندسية والتقنية، والمصممة خصيصاً لتأهيل كوادر مؤهلة علمياً وعملياً.</p>
+            <div class="list-items">
+                <div class="list-item">قسم الحاسوب</div>
+                <div class="list-item">قسم المحاسبة</div>
+                <div class="list-item">قسم إدارة الأعمال</div>
+                <div class="list-item">قسم القانون</div>
+                <div class="list-item">قسم IT</div>
+            </div>
         </div>
 
+        <!-- الإدارات والمكاتب المحدثة -->
         <div id="administrations" class="section-box">
-            <h3>الإدارات والمكاتب</h3>
-            <p>إدارة الشؤون العلمية، مكتب التسجيل والقبول، إدارة الدراسات والامتحانات، وتقنية المعلومات لضمان سير العملية التعليمية بيسر وكفاءة عالية.</p>
+            <h3>الإدارات والمكاتب الرئيسية</h3>
+            <div class="list-items">
+                <div class="list-item">إدارة رئيس الجامعة</div>
+                <div class="list-item">إدارة الشؤون العلمية</div>
+                <div class="list-item">مكتب التسجيل والقبول</div>
+                <div class="list-item">مكتب الدراسة والامتحانات</div>
+                <div class="list-item">مكتب الجودة</div>
+            </div>
         </div>
+
     </div>
 
     <footer>
