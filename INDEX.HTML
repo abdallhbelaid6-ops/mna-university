@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جامعة المنارة العلمية الأهلية</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', Tahoma, sans-serif;
+        }
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+        }
+        /* الشريط العلوي الرسمي */
+        header {
+            background-color: #0b2545;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 50px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-area h1 {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+        .logo-placeholder {
+            width: 45px;
+            height: 45px;
+            background-color: #134074;
+            color: #ee6c4d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 18px;
+            border: 2px solid #fff;
+        }
+        
+        /* القائمة الرئيسية */
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+        nav a:hover {
+            color: #8da9c4;
+        }
+
+        /* القائمة المنسدلة للوحات (أعلى اليسار) */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropbtn {
+            background-color: #134074;
+            color: white;
+            padding: 10px 18px;
+            font-size: 14px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+        .dropbtn:hover {
+            background-color: #1d5f9c;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            left: 0;
+            background-color: #ffffff;
+            min-width: 210px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #dcdcdc;
+        }
+        .dropdown-content a {
+            color: #333;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 14px;
+            border-bottom: 1px solid #f1f1f1;
+            transition: background 0.2s;
+        }
+        .dropdown-content a:hover {
+            background-color: #f8f9fa;
+            color: #0b2545;
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* المحتوى الرئيسي للواجهة */
+        .hero {
+            background: linear-gradient(rgba(11, 37, 69, 0.85), rgba(11, 37, 69, 0.85)), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80') center/cover;
+            color: white;
+            text-align: center;
+            padding: 100px 20px;
+        }
+        .hero h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+        .hero p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        /* قسم الرؤية والأقسام */
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .section-box {
+            background: #fff;
+            padding: 30px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-right: 5px solid #0b2545;
+        }
+        .section-box h3 {
+            color: #0b2545;
+            margin-bottom: 12px;
+            font-size: 22px;
+        }
+        .section-box p {
+            color: #555;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #0b2545;
+            color: white;
+            font-size: 14px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- الشريط العلوي الرسمي -->
+    <header>
+        <div class="logo-area">
+            <div class="logo-placeholder">م</div>
+            <h1>جامعة المنارة العلمية الأهلية</h1>
+        </div>
+        
+        <nav>
+            <a href="#">الرئيسية</a>
+            <a href="#vision">الرؤية</a>
+            <a href="#departments">الأقسام</a>
+            <a href="#administrations">الإدارات</a>
+            <a href="#students">الطلبة</a>
+        </nav>
+
+        <!-- قائمة منسدلة مخفية في أعلى اليسار للوحات النظام -->
+        <div class="dropdown">
+            <button class="dropbtn">بوابات النظام ▾</button>
+            <div class="dropdown-content">
+                <a href="#student-portal">لوحة الطلبة</a>
+                <a href="#faculty-portal">لوحة أعضاء هيئة التدريس</a>
+                <a href="#admin-portal">لوحة الإدارة (الأدمن)</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- الواجهة الرئيسية -->
+    <section class="hero">
+        <h2>مرحباً بكم في الموقع الرسمي</h2>
+        <p>منظومة أكاديمية متكاملة لتقديم الخدمات التعليمية والإدارية وفق أعلى معايير الجودة والتميز.</p>
+    </section>
+
+    <div class="container">
+        <div id="vision" class="section-box">
+            <h3>رؤية الجامعة</h3>
+            <p>الريادة والتميز في التعليم العالي، البحث العلمي، وخدمة المجتمع، وتوفير بيئة أكاديمية محفزة للإبداع والابتكار بما يلبي احتياجات سوق العمل والتنمية المستدامة.</p>
+        </div>
+
+        <div id="departments" class="section-box">
+            <h3>الأقسام العلمية</h3>
+            <p>تضم الجامعة نخبة من الأقسام الأكاديمية في مجالات العلوم الإقتصادية، المالية، الإدارية، الهندسية والتقنية، والمصممة خصيصاً لتأهيل كوادر مؤهلة علمياً وعملياً.</p>
+        </div>
+
+        <div id="administrations" class="section-box">
+            <h3>الإدارات والمكاتب</h3>
+            <p>إدارة الشؤون العلمية، مكتب التسجيل والقبول، إدارة الدراسات والامتحانات، وتقنية المعلومات لضمان سير العملية التعليمية بيسر وكفاءة عالية.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>جميع الحقوق محفوظة © 2026 - جامعة المنارة العلمية الأهلية</p>
+    </footer>
+
+</body>
+</html>
