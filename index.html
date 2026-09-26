@@ -35,18 +35,23 @@
             font-weight: bold;
             letter-spacing: 0.5px;
         }
-        .logo-placeholder {
-            width: 45px;
-            height: 45px;
-            background-color: #134074;
-            color: #ee6c4d;
+        /* شعار الجامعة البديل لدائرة الحرف */
+        .university-logo {
+            width: 48px;
+            height: 48px;
+            background: #fff;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            font-weight: bold;
-            font-size: 18px;
-            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 2px solid #ee6c4d;
+            overflow: hidden;
+        }
+        .university-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
         /* القائمة الرئيسية */
@@ -92,7 +97,7 @@
             position: absolute;
             left: 0;
             background-color: #ffffff;
-            min-width: 210px;
+            min-width: 230px;
             box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
             z-index: 1;
             border-radius: 4px;
@@ -121,15 +126,16 @@
             background: linear-gradient(rgba(11, 37, 69, 0.85), rgba(11, 37, 69, 0.85)), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80') center/cover;
             color: white;
             text-align: center;
-            padding: 100px 20px;
+            padding: 110px 20px;
         }
         .hero h2 {
-            font-size: 36px;
+            font-size: 34px;
             margin-bottom: 15px;
+            font-weight: bold;
         }
         .hero p {
             font-size: 18px;
-            max-width: 700px;
+            max-width: 750px;
             margin: 0 auto;
             line-height: 1.6;
             color: #e2e8f0;
@@ -175,7 +181,10 @@
     <!-- الشريط العلوي الرسمي -->
     <header>
         <div class="logo-area">
-            <div class="logo-placeholder">م</div>
+            <div class="university-logo">
+                <!-- شعار الجامعة الرمزي -->
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="#0b2545"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+            </div>
             <h1>جامعة المنارة العلمية الأهلية</h1>
         </div>
         
@@ -184,24 +193,24 @@
             <a href="#vision">الرؤية</a>
             <a href="#departments">الأقسام</a>
             <a href="#administrations">الإدارات</a>
-            <a href="#students">الطلبة</a>
         </nav>
 
-        <!-- قائمة منسدلة مخفية في أعلى اليسار للوحات النظام -->
+        <!-- قائمة منسدلة في أعلى اليسار تضم اللوحات المطلوبة -->
         <div class="dropdown">
             <button class="dropbtn">بوابات النظام ▾</button>
             <div class="dropdown-content">
                 <a href="#student-portal">لوحة الطلبة</a>
+                <a href="#employee-portal">لوحة الموظفين</a>
+                <a href="#admin-portal">لوحة الإدارة</a>
                 <a href="#faculty-portal">لوحة أعضاء هيئة التدريس</a>
-                <a href="#admin-portal">لوحة الإدارة (الأدمن)</a>
             </div>
         </div>
     </header>
 
-    <!-- الواجهة الرئيسية -->
+    <!-- الواجهة الرئيسية بالنصوص الجديدة -->
     <section class="hero">
-        <h2>مرحباً بكم في الموقع الرسمي</h2>
-        <p>منظومة أكاديمية متكاملة لتقديم الخدمات التعليمية والإدارية وفق أعلى معايير الجودة والتميز.</p>
+        <h2>مرحبا بكم في جامعة المنارة العلمية الاهلية</h2>
+        <p>صرحٌ علمي يرسّخ المعرفة، ويصنع الكفاءات، ويسهم في بناء مستقبلٍ أفضل.</p>
     </section>
 
     <div class="container">
@@ -212,7 +221,7 @@
 
         <div id="departments" class="section-box">
             <h3>الأقسام العلمية</h3>
-            <p>تضم الجامعة نخبة من الأقسام الأكاديمية في مجالات العلوم الإقتصادية، المالية، الإدارية، الهندسية والتقنية، والمصممة خصيصاً لتأهيل كوادر مؤهلة علمياً وعملياً.</p>
+            <p>تضم الجامعة نخبة من الأقسام الأكاديمية في مجالات العلوم الاقتصادية، المالية، الإدارية، الهندسية والتقنية، والمصممة خصيصاً لتأهيل كوادر مؤهلة علمياً وعملياً.</p>
         </div>
 
         <div id="administrations" class="section-box">
