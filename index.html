@@ -8,17 +8,17 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', Tahoma, sans-serif; }
         body { background-color: #f4f6f9; color: #333; }
         header { background-color: #0b2545; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 15px 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo-area { display: flex; align-items: center; gap: 15px; text-decoration: none; color: #fff; }
         .logo-area h1 { font-size: 19px; font-weight: bold; }
         .university-logo { width: 48px; height: 48px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ee6c4d; }
         nav { display: flex; align-items: center; gap: 25px; }
-        nav a { color: #fff; text-decoration: none; font-size: 15px; transition: color 0.3s; }
+        nav a { color: #fff; text-decoration: none; font-size: 15px; transition: color 0.3s; cursor: pointer; }
         nav a:hover { color: #8da9c4; }
 
         /* القائمة المنسدلة للخدمات الإلكترونية */
         .dropdown { position: relative; display: inline-block; }
         .dropbtn { background-color: #134074; color: white; padding: 10px 18px; font-size: 14px; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .dropdown-content { display: none; position: absolute; left: 0; background-color: #ffffff; min-width: 250px; box-shadow: 0px 8px 16px rgba(0,0,0,0.2); z-index: 10; border-radius: 4px; overflow: hidden; }
+        .dropdown-content { display: none; position: absolute; left: 0; background-color: #ffffff; min-width: 260px; box-shadow: 0px 8px 16px rgba(0,0,0,0.2); z-index: 10; border-radius: 4px; overflow: hidden; }
         .dropdown-content a { color: #333; padding: 12px 16px; text-decoration: none; display: block; font-size: 14px; border-bottom: 1px solid #f1f1f1; cursor: pointer; }
         .dropdown-content a:hover { background-color: #f8f9fa; color: #0b2545; }
         .dropdown:hover .dropdown-content { display: block; }
@@ -30,27 +30,30 @@
         .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
         .section-box { background: #fff; padding: 30px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-right: 5px solid #0b2545; }
         .section-box h3 { color: #0b2545; margin-bottom: 15px; font-size: 22px; }
-        .list-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px; }
-        .list-item { background: #f8f9fa; padding: 15px; border-radius: 6px; border: 1px solid #e9ecef; font-weight: bold; color: #134074; }
-
-        /* نوافذ النظام المنبثقة التفاعلية */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); justify-content: center; align-items: center; }
-        .modal-content { background-color: #fff; padding: 30px; border-radius: 8px; width: 500px; max-width: 95%; max-height: 90vh; overflow-y: auto; text-align: right; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
-        .modal-content h3 { color: #0b2545; margin-bottom: 15px; border-bottom: 2px solid #ee6c4d; padding-bottom: 8px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: bold; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        .modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-        .btn-submit { background-color: #0b2545; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .btn-close { background-color: #ccc; color: #333; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
         
-        /* الجداول داخل اللوحات */
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; font-size: 13px; }
+        .list-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px; }
+        .list-item { background: #f8f9fa; padding: 18px; border-radius: 6px; border: 1px solid #e9ecef; font-weight: bold; color: #134074; text-decoration: none; display: block; text-align: center; transition: all 0.3s; cursor: pointer; }
+        .list-item:hover { background: #0b2545; color: #fff; transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+        /* حاوية الصفحات المستقلة */
+        .page-view { display: none; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-top: 30px; }
+        .page-view h2 { color: #0b2545; margin-bottom: 20px; border-bottom: 2px solid #ee6c4d; padding-bottom: 10px; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: bold; color: #0b2545; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
+        .btn-main { background-color: #0b2545; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 15px; transition: background 0.3s; }
+        .btn-main:hover { background-color: #134074; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; font-size: 14px; }
         th { background-color: #0b2545; color: white; }
         .badge-pending { color: #d97706; font-weight: bold; }
         .badge-approved { color: #16a34a; font-weight: bold; }
         .badge-rejected { color: #dc2626; font-weight: bold; }
+
+        .back-btn { display: inline-block; margin-bottom: 20px; background: #ee6c4d; color: #fff; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-size: 13px; font-weight: bold; }
+        .back-btn:hover { background: #d95336; }
 
         footer { text-align: center; padding: 20px; background-color: #0b2545; color: white; font-size: 14px; margin-top: 50px; }
     </style>
@@ -58,137 +61,150 @@
 <body>
 
     <header>
-        <div class="logo-area">
+        <a class="logo-area" onclick="showPage('homePage')" style="cursor: pointer;">
             <div class="university-logo">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="#0b2545"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
             </div>
             <h1>جامعة المنارة العلمية الأهلية</h1>
-        </div>
+        </a>
         
         <nav>
-            <a href="#">الرئيسية</a>
-            <a href="#departments">الأقسام</a>
-            <a href="#administrations">الإدارات</a>
+            <a onclick="showPage('homePage')">الرئيسية</a>
+            <a onclick="scrollToSection('departments')">الأقسام العلمية</a>
+            <a onclick="scrollToSection('administrations')">الإدارات</a>
         </nav>
 
         <!-- قائمة الخدمات الإلكترونية -->
         <div class="dropdown">
             <button class="dropbtn">الخدمات الإلكترونية ▾</button>
             <div class="dropdown-content">
-                <a onclick="openStudentPortal()">بوابة الطلبة (تسجيل ونتائج)</a>
-                <a onclick="openModal('employeeModal')">بوابة الموظفين (تسجيل الطلبة)</a>
-                <a onclick="openModal('facultyModal')">بوابة أعضاء هيئة التدريس (رصد الدرجات)</a>
-                <a onclick="openModal('adminModal')">بوابة الإدارة (مراجعة واعتماد)</a>
+                <a onclick="showPage('studentPage')">بوابة الطلبة (تسجيل ونتائج)</a>
+                <a onclick="showPage('employeePage')">بوابة الموظفين (ملفات وتسجيل الطلبة)</a>
+                <a onclick="showPage('facultyPage')">بوابة أعضاء هيئة التدريس (رصد الدرجات)</a>
+                <a onclick="showPage('adminPage')">بوابة الإدارة (مراجعة وقبول الطلبات)</a>
             </div>
         </div>
     </header>
 
-    <section class="hero">
-        <h2>مرحبا بكم في جامعة المنارة العلمية الاهلية</h2>
-        <p>صرحٌ علمي يرسّخ المعرفة، ويصنع الكفاءات، ويسهم في بناء مستقبلٍ أفضل.</p>
-    </section>
+    <!-- الصفحة الرئيسية -->
+    <div id="homePage">
+        <section class="hero">
+            <h2>مرحبا بكم في جامعة المنارة العلمية الاهلية</h2>
+            <p>صرحٌ علمي يرسّخ المعرفة، ويصنع الكفاءات، ويسهم في بناء مستقبلٍ أفضل.</p>
+        </section>
 
-    <div class="container">
-        <div id="departments" class="section-box">
-            <h3>الأقسام العلمية</h3>
-            <div class="list-items">
-                <div class="list-item">قسم الحاسوب</div>
-                <div class="list-item">قسم المحاسبة</div>
-                <div class="list-item">قسم إدارة الأعمال</div>
-                <div class="list-item">قسم القانون</div>
-                <div class="list-item">قسم IT</div>
+        <div class="container">
+            <div id="departments" class="section-box">
+                <h3>الأقسام العلمية (اضغط على أي قسم لعرض مقرراته التفصيلية)</h3>
+                <div class="list-items">
+                    <a class="list-item" onclick="showDepartment('computer')">قسم الحاسوب</a>
+                    <a class="list-item" onclick="showDepartment('accounting')">قسم المحاسبة</a>
+                    <a class="list-item" onclick="showDepartment('business')">قسم إدارة الأعمال</a>
+                    <a class="list-item" onclick="showDepartment('law')">قسم القانون</a>
+                    <a class="list-item" onclick="showDepartment('it')">قسم تقنية المعلومات (IT)</a>
+                </div>
             </div>
-        </div>
 
-        <div id="administrations" class="section-box">
-            <h3>الإدارات والمكاتب الرئيسية</h3>
-            <div class="list-items">
-                <div class="list-item">إدارة رئيس الجامعة</div>
-                <div class="list-item">إدارة الشؤون العلمية</div>
-                <div class="list-item">مكتب التسجيل والقبول</div>
-                <div class="list-item">مكتب الدراسة والامتحانات</div>
-                <div class="list-item">مكتب الجودة</div>
+            <div id="administrations" class="section-box">
+                <h3>الإدارات والمكاتب الرئيسية</h3>
+                <div class="list-items">
+                    <div class="list-item" style="cursor:default;">إدارة رئيس الجامعة</div>
+                    <div class="list-item" style="cursor:default;">إدارة الشؤون العلمية</div>
+                    <div class="list-item" style="cursor:default;">مكتب التسجيل والقبول</div>
+                    <div class="list-item" style="cursor:default;">مكتب الدراسة والامتحانات</div>
+                    <div class="list-item" style="cursor:default;">مكتب الجودة</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- نافذة بوابة الطلبة -->
-    <div id="studentModal" class="modal">
-        <div class="modal-content" style="width: 550px;">
-            <h3>بوابة الطلبة - التسجيل والاستعلام عن النتائج</h3>
-            <div id="studentLoginSection">
+    <!-- صفحة تفاصيل القسم والمقررات -->
+    <div class="container">
+        <div id="departmentPage" class="page-view">
+            <a class="back-btn" onclick="showPage('homePage')">← العودة للرئيسية</a>
+            <h2 id="deptTitle">عنوان القسم</h2>
+            <p id="deptDesc" style="margin-bottom: 20px; color: #555; line-height: 1.6;"></p>
+            <h3 style="color: #0b2545; margin-bottom: 10px;">المقررات الدراسية للقسم:</h3>
+            <table>
+                <thead>
+                    <tr><th>رقم المقرر</th><th>اسم المقرر الدراسي</th><th>عدد الوحدات</th><th>الفصل الدراسي</th></tr>
+                </thead>
+                <tbody id="coursesTableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- صفحة بوابة الطلبة -->
+        <div id="studentPage" class="page-view">
+            <a class="back-btn" onclick="showPage('homePage')">← العودة للرئيسية</a>
+            <h2>بوابة الطلبة - التسجيل والاستعلام عن النتيجة</h2>
+            <p style="margin-bottom: 20px; color: #666;">يمكنك هنا تقديم طلب التسجيل الجديد، أو الاستعلام عن النتيجة النهائية (بشرط سداد الرسوم الدرااسية).</p>
+            
+            <div style="max-width: 600px;">
                 <div class="form-group"><label>رقم القيد:</label><input type="text" id="stID" placeholder="أدخل رقم القيد"></div>
                 <div class="form-group"><label>اسم الطالب:</label><input type="text" id="stName" placeholder="الاسم الكامل"></div>
                 <div class="form-group"><label>القسم الدراسي:</label>
                     <select id="stDept">
-                        <option>قسم الحاسوب</option><option>قسم المحاسبة</option><option>قسم إدارة الأعمال</option><option>قسم القانون</option><option>قسم IT</option>
+                        <option>قسم الحاسوب</option><option>قسم المحاسبة</option><option>قسم إدارة الأعمال</option><option>قسم القانون</option><option>قسم تقنية المعلومات (IT)</option>
                     </select>
                 </div>
-                <div class="modal-buttons">
-                    <button class="btn-submit" onclick="submitStudentRegistration()">إرسال طلب التسجيل</button>
-                    <button class="btn-submit" style="background-color:#16a34a;" onclick="checkStudentResult()">استعلام عن النتيجة</button>
-                    <button class="btn-close" onclick="closeModal('studentModal')">إغلاق</button>
+                <div style="display: flex; gap: 10px; margin-top: 20px;">
+                    <button class="btn-main" onclick="submitStudentRegistration()">إرسال طلب التسجيل</button>
+                    <button class="btn-main" style="background-color:#16a34a;" onclick="checkStudentResult()">استعلام عن النتيجة (شرط سداد الرسوم)</button>
                 </div>
-            </div>
-            <div id="studentResultDisplay" style="margin-top:15px; display:none;"></div>
-        </div>
-    </div>
-
-    <!-- نافذة بوابة الموظفين -->
-    <div id="employeeModal" class="modal">
-        <div class="modal-content">
-            <h3>بوابة الموظفين - تسجيل بيانات الطلبة</h3>
-            <div class="form-group"><label>الرقم الوظيفي:</label><input type="text" id="empID" placeholder="EMP-XXX"></div>
-            <div class="form-group"><label>اسم الطالب المراد قيده:</label><input type="text" id="newStName" placeholder="اسم الطالب"></div>
-            <div class="form-group"><label>رقم القيد الجديد:</label><input type="text" id="newStID" placeholder="رقم القيد"></div>
-            <div class="modal-buttons">
-                <button class="btn-submit" onclick="employeeRegisterStudent()">حفظ وإرسال للإدارة</button>
-                <button class="btn-close" onclick="closeModal('employeeModal')">إلغاء</button>
+                <div id="studentResultDisplay" style="margin-top: 20px;"></div>
             </div>
         </div>
-    </div>
 
-    <!-- نافذة بوابة أعضاء هيئة التدريس -->
-    <div id="facultyModal" class="modal">
-        <div class="modal-content">
-            <h3>بوابة أعضاء هيئة التدريس - رصد الدرجات</h3>
-            <div class="form-group"><label>رقم العضوية:</label><input type="text" id="facID" placeholder="FAC-XXX"></div>
-            <div class="form-group"><label>رقم قيد الطالب:</label><input type="text" id="facStID" placeholder="رقم القيد"></div>
-            <div class="form-group"><label>المادة الدراسية:</label><input type="text" id="facSubject" placeholder="اسم المادة"></div>
-            <div class="form-group"><label>أعمال السنة (من 40):</label><input type="number" id="facMid" placeholder="0-40"></div>
-            <div class="form-group"><label>الامتحان النهائي (من 60):</label><input type="number" id="facFinal" placeholder="0-60"></div>
-            <div class="modal-buttons">
-                <button class="btn-submit" onclick="saveGrades()">حفظ ورصد الدرجات</button>
-                <button class="btn-close" onclick="closeModal('facultyModal')">إلغاء</button>
+        <!-- صفحة بوابة الموظفين -->
+        <div id="employeePage" class="page-view">
+            <a class="back-btn" onclick="showPage('homePage')">← العودة للرئيسية</a>
+            <h2>بوابة الموظفين - الشؤون الإدارية والطلابية</h2>
+            <p style="margin-bottom: 20px; color: #666;">كل موظف له ملف خاص؛ مخصص لتنزيل وإدخال أسماء الطلبة الجدد وأرقام قيودهم.</p>
+            
+            <div style="max-width: 600px;">
+                <div class="form-group"><label>الرقم الوظيفي للموظف:</label><input type="text" id="empID" placeholder="EMP-XXX"></div>
+                <div class="form-group"><label>اسم الطالب الجديد:</label><input type="text" id="newStName" placeholder="اسم الطالب الكامل"></div>
+                <div class="form-group"><label>رقم القيد المقترح:</label><input type="text" id="newStID" placeholder="رقم القيد"></div>
+                <button class="btn-main" onclick="employeeRegisterStudent()">حفظ الطالب وإرساله للمنظومة</button>
             </div>
         </div>
-    </div>
 
-    <!-- نافذة بوابة الإدارة (الأدمن) -->
-    <div id="adminModal" class="modal">
-        <div class="modal-content" style="width: 650px;">
-            <h3>بوابة الإدارة - إدارة واعتماد الطلبات</h3>
-            <div id="adminLoginForm">
+        <!-- صفحة بوابة أعضاء هيئة التدريس -->
+        <div id="facultyPage" class="page-view">
+            <a class="back-btn" onclick="showPage('homePage')">← العودة للرئيسية</a>
+            <h2>بوابة أعضاء هيئة التدريس - رصد وتنزيل الدرجات</h2>
+            <p style="margin-bottom: 20px; color: #666;">إدخال ورصد درجات أعمال السنة والامتحان النهائي للطلبة المسجلين بالمقررات.</p>
+            
+            <div style="max-width: 600px;">
+                <div class="form-group"><label>رقم عضوية هيئة التدريس:</label><input type="text" id="facID" placeholder="FAC-XXX"></div>
+                <div class="form-group"><label>رقم قيد الطالب:</label><input type="text" id="facStID" placeholder="رقم القيد"></div>
+                <div class="form-group"><label>المادة الدراسية:</label><input type="text" id="facSubject" placeholder="اسم المادة"></div>
+                <div class="form-group"><label>أعمال السنة (من 40):</label><input type="number" id="facMid" placeholder="0-40"></div>
+                <div class="form-group"><label>الامتحان النهائي (من 60):</label><input type="number" id="facFinal" placeholder="0-60"></div>
+                <button class="btn-main" onclick="saveGrades()">حفظ ورصد الدرجات</button>
+            </div>
+        </div>
+
+        <!-- صفحة بوابة الإدارة (الأدمن) -->
+        <div id="adminPage" class="page-view">
+            <a class="back-btn" onclick="showPage('homePage')">← العودة للرئيسية</a>
+            <h2>بوابة الإدارة (الأدمن) - اعتماد الطلبات</h2>
+            
+            <div id="adminLoginForm" style="max-width: 500px;">
+                <p style="margin-bottom: 15px; color: #666;">الرجاء إدخال بيانات المشرف (الأدمن) للوصول للوحة التحكم:</p>
                 <div class="form-group"><label>اسم المستخدم:</label><input type="text" id="admUser" value="admin"></div>
                 <div class="form-group"><label>الرقم السري:</label><input type="password" id="admPass" value="admin123"></div>
-                <div class="modal-buttons">
-                    <button class="btn-submit" onclick="adminLogin()">دخول لوحة التحكم</button>
-                    <button class="btn-close" onclick="closeModal('adminModal')">إلغاء</button>
-                </div>
+                <button class="btn-main" onclick="adminLogin()">دخول لوحة التحكم</button>
             </div>
-            <div id="adminDashboard" style="display:none;">
-                <p style="margin-bottom:10px; font-weight:bold; color:#0b2545;">طلبات التسجيل الواردة:</p>
-                <div style="max-height: 300px; overflow-y: auto;">
-                    <table id="requestsTable">
-                        <thead>
-                            <tr><th>المسلسل</th><th>اسم الطالب</th><th>رقم القيد</th><th>القسم</th><th>الحالة</th><th>إجراء</th></tr>
-                        </thead>
-                        <tbody></tbody>
-                    </table>
-                </div>
-                <div class="modal-buttons" style="margin-top:15px;">
-                    <button class="btn-close" onclick="closeModal('adminModal')">إغلاق لوحة الأدمن</button>
-                </div>
+
+            <div id="adminDashboard" style="display:none; margin-top: 20px;">
+                <p style="margin-bottom:15px; font-weight:bold; color:#0b2545;">طلبات التسجيل الواردة (موافقة أو رفض):</p>
+                <table>
+                    <thead>
+                        <tr><th>م</th><th>اسم الطالب</th><th>رقم القيد</th><th>القسم</th><th>الحالة</th><th>الإجراء</th></tr>
+                    </thead>
+                    <tbody id="requestsTableBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -198,94 +214,185 @@
     </footer>
 
     <script>
-        // قاعدة بيانات وهمية تعمل في ذاكرة المتصفح
-        let dbRequests = JSON.parse(localStorage.getItem('mna_requests')) || [
-            { id: 1, name: 'محمد أحمد', stID: '2026101', dept: 'قسم الحاسوب', status: 'مقبول', feesPaid: true, mid: 35, final: 50, subject: 'برمجة' },
-            { id: 2, name: 'فاطمة علي', stID: '2026102', dept: 'قسم المحاسبة', status: 'قيد الانتظار', feesPaid: false, mid: 0, final: 0, subject: 'محاسبة مالية' }
-        ];
+        // قاعدة البيانات للمقررات لكل قسم
+        const departmentsData = {
+            computer: {
+                title: "قسم علوم الحاسوب",
+                desc: "يهتم القسم بتدريس علوم البرمجيات، وهندسة الحاسوب، وتصميم نظم التشغيل وقواعد البيانات المتقدمة.",
+                courses: [
+                    {code: "CS101", name: "مقدمة في علوم الحاسوب", units: 3, term: "الأول"},
+                    {code: "CS102", name: "برمجة هيكلية (1)", units: 3, term: "الثاني"},
+                    {code: "CS201", name: "هياكل البيانات والخوارزميات", units: 3, term: "الثالث"},
+                    {code: "CS301", name: "قواعد البيانات المتقدمة", units: 3, term: "الخامس"}
+                ]
+            },
+            accounting: {
+                title: "قسم المحاسبة والمالية",
+                desc: "يختص بتأهيل الكادر المحاسبي في مجالات المحاسبة المالية، ومحاسبة التكاليف، والمراجعة والتدقيق والتحليل المالي.",
+                courses: [
+                    {code: "ACC101", name: "مبادئ المحاسبة المالية (1)", units: 3, term: "الأول"},
+                    {code: "ACC102", name: "مبادئ المحاسبة المالية (2)", units: 3, term: "الثاني"},
+                    {code: "ACC201", name: "محاسبة التكاليف", units: 3, term: "الثالث"},
+                    {code: "ACC301", name: "المراجعة والتدقيق الخارجي", units: 3, term: "الخامس"}
+                ]
+            },
+            business: {
+                title: "قسم إدارة الأعمال",
+                desc: "يركز على نظريات الإدارة الحديثة، سلوك المنظمات، الإدارة الاستراتيجية، وإدارة التسويق والموارد البشرية.",
+                courses: [
+                    {code: "BUS101", name: "مبادئ إدارة الأعمال", units: 3, term: "الأول"},
+                    {code: "BUS102", name: "سلوك تنظيمي", units: 3, term: "الثاني"},
+                    {code: "BUS201", name: "إدارة الإنتاج والعمليات", units: 3, term: "الثالث"},
+                    {code: "BUS301", name: "الإدارة الاستراتيجية", units: 3, term: "الخامس"}
+                ]
+            },
+            law: {
+                title: "قسم القانون",
+                desc: "يهدف لتدريس القوانين الوضعية، القانون المدني، الجنائي، التجاري، والدولي، وإعداد الكفاءات القانونية.",
+                courses: [
+                    {code: "LAW101", name: "مدخل لعلوم القانون", units: 3, term: "الأول"},
+                    {code: "LAW102", name: "القانون الدستوري", units: 3, term: "الثاني"},
+                    {code: "LAW201", name: "القانون الإداري", units: 3, term: "الثالث"},
+                    {code: "LAW301", name: "القانون التجاري", units: 3, term: "الخامس"}
+                ]
+            },
+            it: {
+                title: "قسم تقنية المعلومات (IT)",
+                desc: "يغطي شبكات الحاسوب، أمن المعلومات، تطوير تطبيقات الويب والهواتف الذكية، وإدارة النظم السحابية.",
+                courses: [
+                    {code: "IT101", name: "أساسيات تقنية المعلومات", units: 3, term: "الأول"},
+                    {code: "IT102", name: "شبكات الحاسوب (1)", units: 3, term: "الثاني"},
+                    {code: "IT201", name: "تطوير واجهات الويب", units: 3, term: "الثالث"},
+                    {code: "IT301", name: "أمن المعلومات والشبكات", units: 3, term: "الخامس"}
+                ]
+            }
+        };
 
-        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-        function openStudentPortal() { openModal('studentModal'); }
+        // الذاكرة التخزينية للطلبات والنتائج والدرجات
+        let dbRequests = JSON.parse(localStorage.getItem('mna_requests')) || [
+            { id: 1, name: 'محمد أحمد', stID: '2026101', dept: 'قسم الحاسوب', status: 'مقبول', feesPaid: true, mid: 35, final: 50, subject: 'مقدمة في علوم الحاسوب' },
+            { id: 2, name: 'فاطمة علي', stID: '2026102', dept: 'قسم المحاسبة', status: 'قيد الانتظار', feesPaid: false, mid: 0, final: 0, subject: 'مبادئ المحاسبة' }
+        ];
 
         function saveData() { localStorage.setItem('mna_requests', JSON.stringify(dbRequests)); }
 
+        // التبديل بين الصفحات بالكامل
+        function showPage(pageId) {
+            const pages = ['homePage', 'departmentPage', 'studentPage', 'employeePage', 'facultyPage', 'adminPage'];
+            pages.forEach(p => {
+                document.getElementById(p).style.display = (p === pageId) ? 'block' : 'none';
+            });
+            window.scrollTo(0, 0);
+        }
+
+        function scrollToSection(sectionId) {
+            showPage('homePage');
+            setTimeout(() => {
+                document.getElementById(sectionId).scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        // عرض صفحة القسم والمقررات التابعة له
+        function showDepartment(deptKey) {
+            let dept = departmentsData[deptKey];
+            if(!dept) return;
+
+            document.getElementById('deptTitle').innerText = dept.title;
+            document.getElementById('deptDesc').innerText = dept.desc;
+
+            let tbody = document.getElementById('coursesTableBody');
+            tbody.innerHTML = '';
+            dept.courses.forEach(c => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `<td>${c.code}</td><td>${c.name}</td><td>${c.units}</td><td>${c.term}</td>`;
+                tbody.appendChild(tr);
+            });
+
+            showPage('departmentPage');
+        }
+
         // تسجيل الطالب
         function submitStudentRegistration() {
-            let stID = document.getElementById('stID').value;
-            let name = document.getElementById('stName').value;
+            let stID = document.getElementById('stID').value.trim();
+            let name = document.getElementById('stName').value.trim();
             let dept = document.getElementById('stDept').value;
             if(!stID || !name) { alert('الرجاء إدخال رقم القيد والاسم كاملين'); return; }
-            
+
             dbRequests.push({ id: Date.now(), name: name, stID: stID, dept: dept, status: 'قيد الانتظار', feesPaid: false, mid: 0, final: 0, subject: 'عام' });
             saveData();
             alert('تم تقديم طلب التسجيل بنجاح، بانتظار مراجعة وموافقة الإدارة.');
-            closeModal('studentModal');
+            document.getElementById('stID').value = '';
+            document.getElementById('stName').value = '';
         }
 
-        // الاستعلام عن النتيجة بشرط سداد الرسوم
+        // الاستعلام عن النتيجة مع شرط سداد الرسوم
         function checkStudentResult() {
-            let stID = document.getElementById('stID').value;
+            let stID = document.getElementById('stID').value.trim();
             let disp = document.getElementById('studentResultDisplay');
             if(!stID) { alert('الرجاء إدخال رقم القيد أولاً'); return; }
 
             let student = dbRequests.find(s => s.stID === stID);
-            disp.style.display = 'block';
             if(!student) {
-                disp.innerHTML = '<p style="color:red;">عذراً، لم يتم العثور على طالب بهذا الرقم في المنظومة.</p>';
+                disp.innerHTML = '<p style="color:red; font-weight:bold;">عذراً، لم يتم العثور على طالب بهذا الرقم في المنظومة.</p>';
                 return;
             }
             if(student.status !== 'مقبول') {
-                disp.innerHTML = '<p style="color:orange;">حالة التسجيل: ' + student.status + '. يجوز عرض النتيجة بعد قبول التسجيل من الإدارة.</p>';
+                disp.innerHTML = `<p style="color:orange; font-weight:bold;">حالة التسجيل: ${student.status}. لا يمكن عرض النتيجة إلا بعد اعتماد التسجيل من الإدارة.</p>`;
                 return;
             }
             if(!student.feesPaid) {
-                disp.innerHTML = '<p style="color:red; font-weight:bold;">عذراً، لا يمكنك عرض النتيجة لعدم سداد الرسوم الدراسية. يرجى مراجعة الشؤون المالية.</p>';
+                disp.innerHTML = `<p style="color:red; font-weight:bold;">عذراً، تعذر عرض النتيجة لعدم سداد الرسوم الدراسية الأكاديمية. يرجى مراجعة الشؤون المالية بالجامعة.</p>`;
                 return;
             }
+
             let total = student.mid + student.final;
-            disp.innerHTML = `<div style="background:#e8f5e9; padding:15px; border-radius:5px; border:1px solid #c8e6c9;">
-                <p><b>اسم الطالب:</b> ${student.name}</p>
-                <p><b>المادة:</b> ${student.subject}</p>
-                <p><b>أعمال السنة:</b> ${student.mid} | <b>النهائي:</b> ${student.final}</p>
-                <p style="font-size:16px; color:#1b5e20; margin-top:5px;"><b>المجموع الكلي:</b> ${total} من 100 - <span style="color:blue;">ناجح</span></p>
-            </div>`;
+            disp.innerHTML = `
+                <div style="background:#e8f5e9; padding:20px; border-radius:6px; border:1px solid #c8e6c9;">
+                    <h3 style="color:#1b5e20; margin-bottom:10px;">نتيجة الطالب الفصلية</h3>
+                    <p><b>اسم الطالب:</b> ${student.name}</p>
+                    <p><b>رقم القيد:</b> ${student.stID}</p>
+                    <p><b>المادة:</b> ${student.subject}</p>
+                    <p><b>أعمال السنة:</b> ${student.mid} / 40 | <b>النهائي:</b> ${student.final} / 60</p>
+                    <p style="font-size:16px; color:#1b5e20; margin-top:8px;"><b>المجموع الكلي:</b> ${total} من 100 - <span style="color:blue;">ناجح</span></p>
+                </div>
+            `;
         }
 
         // تسجيل الموظف لطالب جديد
         function employeeRegisterStudent() {
-            let empID = document.getElementById('empID').value;
-            let name = document.getElementById('newStName').value;
-            let stID = document.getElementById('newStID').value;
-            if(!empID || !name || !stID) { alert('الرجاء ملء كافة الحقول'); return; }
+            let empID = document.getElementById('empID').value.trim();
+            let name = document.getElementById('newStName').value.trim();
+            let stID = document.getElementById('newStID').value.trim();
+            if(!empID || !name || !stID) { alert('الرجاء ملء كافة الحقول المطلوبة'); return; }
 
             dbRequests.push({ id: Date.now(), name: name, stID: stID, dept: 'قسم الحاسوب', status: 'قيد الانتظار', feesPaid: true, mid: 0, final: 0, subject: 'عام' });
             saveData();
-            alert('تم تسجيل الطالب بنجاح عبر الموظف وإرساله لقائمة اعتماد الإدارة.');
-            closeModal('employeeModal');
+            alert('تم تسجيل الطالب بنجاح عبر الموظف وأضيف لقائمة الاعتماد بالمنظومة.');
+            document.getElementById('empID').value = '';
+            document.getElementById('newStName').value = '';
+            document.getElementById('newStID').value = '';
         }
 
         // رصد الدرجات لعضو هيئة التدريس
         function saveGrades() {
-            let facID = document.getElementById('facID').value;
-            let stID = document.getElementById('facStID').value;
+            let facID = document.getElementById('facID').value.trim();
+            let stID = document.getElementById('facStID').value.trim();
             let mid = parseFloat(document.getElementById('facMid').value) || 0;
             let final = parseFloat(document.getElementById('facFinal').value) || 0;
-            let subject = document.getElementById('facSubject').value;
+            let subject = document.getElementById('facSubject').value.trim();
 
-            if(!facID || !stID) { alert('الرجاء إدخال رقم العضوية ورقم القيد'); return; }
+            if(!facID || !stID) { alert('الرجاء إدخال رقم العضوية ورقم قيد الطالب'); return; }
             let student = dbRequests.find(s => s.stID === stID);
             if(!student) { alert('رقم قيد الطالب غير مسجل في المنظومة'); return; }
 
             student.mid = mid;
             student.final = final;
-            student.subject = subject || student.subject;
+            if(subject) student.subject = subject;
             saveData();
             alert('تم رصد وحفظ الدرجات بنجاح للطالب ' + student.name);
-            closeModal('facultyModal');
         }
 
-        // تسجيل دخول الأدمن
+        // دخول الأدمن
         function adminLogin() {
             let u = document.getElementById('admUser').value;
             let p = document.getElementById('admPass').value;
@@ -294,12 +401,12 @@
                 document.getElementById('adminDashboard').style.display = 'block';
                 loadAdminTable();
             } else {
-                alert('خطأ في بيانات الإدارة');
+                alert('خطأ في اسم المستخدم أو الرقم السري للإدارة');
             }
         }
 
         function loadAdminTable() {
-            let tbody = document.querySelector('#requestsTable tbody');
+            let tbody = document.getElementById('requestsTableBody');
             tbody.innerHTML = '';
             dbRequests.forEach((req, index) => {
                 let tr = document.createElement('tr');
@@ -311,8 +418,8 @@
                     <td>${req.dept}</td>
                     <td class="${statusClass}">${req.status}</td>
                     <td>
-                        <button onclick="changeStatus(${req.id}, 'مقبول')" style="background:#16a34a; color:#fff; border:none; padding:5px 8px; border-radius:3px; cursor:pointer;">قبول</button>
-                        <button onclick="changeStatus(${req.id}, 'مرفوض')" style="background:#dc2626; color:#fff; border:none; padding:5px 8px; border-radius:3px; cursor:pointer;">رفض</button>
+                        <button onclick="changeStatus(${req.id}, 'مقبول')" style="background:#16a34a; color:#fff; border:none; padding:6px 12px; border-radius:3px; cursor:pointer; font-weight:bold;">قبول</button>
+                        <button onclick="changeStatus(${req.id}, 'مرفوض')" style="background:#dc2626; color:#fff; border:none; padding:6px 12px; border-radius:3px; cursor:pointer; font-weight:bold;">رفض</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
