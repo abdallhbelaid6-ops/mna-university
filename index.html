@@ -3,490 +3,1547 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>جامعة المنارة العلمية الأهلية - المنظومة الأكاديمية الشاملة</title>
+    <title>وصلني الشاطئ - المنظومة الذكية المتكاملة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', Tahoma, sans-serif; }
-        body { background-color: #f4f6f9; color: #333; }
-        header { background-color: #0b2545; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 15px 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .logo-area { display: flex; align-items: center; gap: 15px; text-decoration: none; color: #fff; cursor: pointer; }
-        .logo-area h1 { font-size: 19px; font-weight: bold; }
-        .university-logo { width: 48px; height: 48px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #ee6c4d; }
-        nav { display: flex; align-items: center; gap: 25px; }
-        nav a { color: #fff; text-decoration: none; font-size: 15px; transition: color 0.3s; cursor: pointer; }
-        nav a:hover { color: #8da9c4; }
-
-        /* القائمة المنسدلة للخدمات الإلكترونية */
-        .dropdown { position: relative; display: inline-block; }
-        .dropbtn { background-color: #134074; color: white; padding: 10px 18px; font-size: 14px; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
-        .dropdown-content { display: none; position: absolute; left: 0; background-color: #ffffff; min-width: 290px; box-shadow: 0px 8px 16px rgba(0,0,0,0.2); z-index: 10; border-radius: 4px; overflow: hidden; }
-        .dropdown-content a { color: #333; padding: 12px 16px; text-decoration: none; display: block; font-size: 14px; border-bottom: 1px solid #f1f1f1; cursor: pointer; }
-        .dropdown-content a:hover { background-color: #f8f9fa; color: #0b2545; }
-        .dropdown:hover .dropdown-content { display: block; }
-
-        .hero { background: linear-gradient(rgba(11, 37, 69, 0.85), rgba(11, 37, 69, 0.85)), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80') center/cover; color: white; text-align: center; padding: 100px 20px; }
-        .hero h2 { font-size: 32px; margin-bottom: 15px; }
-        .hero p { font-size: 17px; max-width: 750px; margin: 0 auto; color: #e2e8f0; line-height: 1.6; }
-
-        .container { max-width: 1100px; margin: 40px auto; padding: 0 20px; }
-        .section-box { background: #fff; padding: 30px; margin-bottom: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border-right: 5px solid #0b2545; }
-        .section-box h3 { color: #0b2545; margin-bottom: 15px; font-size: 22px; }
+        :root {
+            --primary: #0088cc;
+            --primary-dark: #006699;
+            --secondary: #ff9900;
+            --accent: #28a745;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --danger: #dc3545;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); display: flex; min-height: 100vh; flex-direction: row; }
+        .sidebar { width: 240px; background: linear-gradient(180deg, #004080, #006699); color: white; display: flex; flex-direction: column; position: fixed; height: 100vh; right: 0; top: 0; z-index: 1000; box-shadow: -4px 0 15px rgba(0,0,0,0.15); }
+        .sidebar-header { padding: 20px 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; user-select: none; }
+        .sidebar-header h2 { font-size: 1.2rem; color: #ff9900; font-weight: 900; pointer-events: none; }
+        .sidebar-menu { list-style: none; padding: 10px 0; flex: 1; overflow-y: auto; }
+        .sidebar-menu li { padding: 12px 15px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 0.95rem; transition: 0.3s; border-right: 4px solid transparent; }
+        .sidebar-menu li:hover, .sidebar-menu li.active { background: rgba(255,255,255,0.1); border-right-color: #ff9900; color: #ff9900; }
+        .sidebar-menu li i { width: 20px; text-align: center; pointer-events: none; }
+        .sidebar-footer { padding: 12px; display: flex; justify-content: center; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; color: #cbd5e1; }
+        .main-content { margin-right: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; width: calc(100% - 240px); }
+        header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 12px 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 900; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .header-title h1 { font-size: 1.1rem; font-weight: 900; }
+        .status-badge { background: rgba(255, 255, 255, 0.2); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; }
+        .status-dot { width: 8px; height: 8px; background-color: #ffc107; border-radius: 50%; display: inline-block; }
+        .status-dot.connected { background-color: #28a745; box-shadow: 0 0 8px #28a745; }
+        .container { max-width: 1000px; margin: 15px auto; padding: 0 15px; width: 100%; flex: 1; }
+        .card { background: var(--card-bg); border-radius: 14px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: none; }
+        .card.active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        h2.section-title { font-size: 1.15rem; color: var(--primary-dark); margin-bottom: 15px; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; }
+        .sub-switch-btns { display: flex; gap: 8px; margin-bottom: 15px; }
+        .sub-btn { flex: 1; padding: 8px; border: 2px solid var(--primary); background: transparent; color: var(--primary); font-weight: bold; font-size: 0.9rem; border-radius: 8px; cursor: pointer; transition: 0.3s; }
+        .sub-btn.active { background: var(--primary); color: white; }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        .form-group { margin-bottom: 12px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.85rem; }
+        input, select, textarea { width: 100%; padding: 10px; border: 2px solid #e1e8ed; border-radius: 8px; font-size: 0.95rem; outline: none; background: #fff; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+        .btn { background: var(--primary); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: background 0.3s; text-align: center; text-decoration: none; display: inline-block; }
+        .btn:hover { background: var(--primary-dark); }
+        .btn-success { background: var(--accent); }
+        .btn-danger { background: var(--danger); }
+        .driver-order-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+        .data-table th, .data-table td { border: 1px solid #e2e8f0; padding: 8px; text-align: right; }
+        .data-table th { background: #f1f5f9; }
+        .hero-banner { background: linear-gradient(rgba(0,102,153,0.85), rgba(0,64,128,0.9)), url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80'); background-size: cover; background-position: center; border-radius: 14px; padding: 30px 15px; color: white; text-align: center; margin-bottom: 20px; }
+        .hero-banner h1 { font-size: 1.6rem; font-weight: 900; margin-bottom: 8px; color: #ff9900; }
+        .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+        .service-card { background: white; border-radius: 14px; padding: 15px; border: 2px solid #e2e8f0; text-align: center; }
+        .service-card h3 { color: var(--primary-dark); margin-bottom: 8px; font-size: 1.05rem; }
+        .legal-box { background: #fffbeb; border: 1px solid #fde68a; padding: 12px; border-radius: 8px; font-size: 0.8rem; color: #92400e; margin-bottom: 12px; line-height: 1.5; }
+        .whatsapp-alert { background: #ecfdf5; border: 1px solid #a7f3d0; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; color: #065f46; display: flex; align-items: center; gap: 10px; }
+        .whatsapp-alert i { font-size: 1.4rem; color: #10b981; }
+        .downloads-ticker { background: linear-gradient(135deg, #0284c7, #0369a1); color: white; padding: 12px 15px; border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+        footer { text-align: center; padding: 12px; font-size: 0.8rem; color: var(--text-muted); background: white; border-top: 1px solid #eaeaea; margin-top: auto; }
         
-        .list-items { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px; }
-        .list-item { background: #f8f9fa; padding: 18px; border-radius: 6px; border: 1px solid #e9ecef; font-weight: bold; color: #134074; text-decoration: none; display: block; text-align: center; transition: all 0.3s; cursor: pointer; }
-        .list-item:hover { background: #0b2545; color: #fff; transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .admin-top-bar { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px 15px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.05); margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .admin-top-bar h2 { font-size: 1.1rem; color: #333; display: flex; align-items: center; gap: 8px; }
+        .admin-nav-tabs { display: flex; gap: 6px; overflow-x: auto; width: 100%; padding-bottom: 5px; }
+        .admin-tab-btn { flex: 1; min-width: 100px; padding: 10px 6px; text-align: center; background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 0.78rem; font-weight: bold; color: #475569; cursor: pointer; transition: 0.3s; }
+        .admin-tab-btn.active { background: #0284c7; color: white; border-color: #0284c7; box-shadow: 0 4px 10px rgba(2,132,199,0.3); }
 
-        .page-content { display: none; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-top: 20px; }
-        .page-content h2 { color: #0b2545; margin-bottom: 15px; border-bottom: 2px solid #ee6c4d; padding-bottom: 10px; }
-        
-        .login-box { max-width: 450px; margin: 20px auto; background: #fdfdfd; padding: 30px; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-        .login-box h3 { color: #0b2545; margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: bold; color: #0b2545; }
-        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
-        .btn-main { background-color: #0b2545; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 15px; transition: background 0.3s; width: 100%; }
-        .btn-main:hover { background-color: #134074; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; font-size: 14px; }
-        th { background-color: #0b2545; color: white; }
-        .badge-pending { color: #d97706; font-weight: bold; }
-        .badge-approved { color: #16a34a; font-weight: bold; }
-        .badge-rejected { color: #dc2626; font-weight: bold; }
-
-        .back-btn { display: inline-block; margin-bottom: 20px; background: #ee6c4d; color: #fff; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-size: 13px; font-weight: bold; cursor: pointer; }
-        .back-btn:hover { background: #d95336; }
-
-        footer { text-align: center; padding: 20px; background-color: #0b2545; color: white; font-size: 14px; margin-top: 50px; }
+        @media(max-width: 768px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: 60px; position: fixed; bottom: 0; top: auto; right: 0; flex-direction: row; justify-content: space-around; align-items: center; padding: 0 5px; }
+            .sidebar-header { display: none; }
+            .sidebar-menu { display: flex; flex-direction: row; width: 100%; justify-content: space-around; padding: 0; }
+            .sidebar-menu li { flex-direction: column; padding: 6px; font-size: 0.75rem; gap: 3px; border-right: none; border-top: 3px solid transparent; text-align: center; }
+            .sidebar-menu li.active { border-top-color: #ff9900; }
+            .sidebar-footer { display: none; }
+            .main-content { margin-right: 0; width: 100%; margin-bottom: 60px; }
+            .services-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-    <header>
-        <a class="logo-area" onclick="showMainHome()">
-            <div class="university-logo">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="#0b2545"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
-            </div>
-            <h1>جامعة المنارة العلمية الأهلية</h1>
-        </a>
-        
-        <nav>
-            <a onclick="showMainHome()">الرئيسية</a>
-            <a onclick="scrollToSection('departments')">الأقسام العلمية ومقرراتها</a>
-            <a onclick="scrollToSection('administrations')">الإدارات</a>
-        </nav>
-
-        <div class="dropdown">
-            <button class="dropbtn">الخدمات الإلكترونية (محمية) ▾</button>
-            <div class="dropdown-content">
-                <a onclick="requestPortalAccess('student')">🔒 بوابة الطلبة (التسجيل والسجل الدراسي)</a>
-                <a onclick="requestPortalAccess('employee')">🔒 بوابة الموظفين (تسجيل الطلبة الجدد)</a>
-                <a onclick="requestPortalAccess('faculty')">🔒 بوابة أعضاء هيئة التدريس (رصد الدرجات)</a>
-                <a onclick="requestPortalAccess('admin')">🔒 بوابة الإدارة (قبول الطلبات والتحكم)</a>
-            </div>
+    <div class="sidebar">
+        <div class="sidebar-header" id="adminSecretTrigger" title="بوابة الإدارة">
+            <h2><i class="fa-solid fa-car-side"></i> وصلني</h2>
         </div>
-    </header>
+        <ul class="sidebar-menu">
+            <li class="active" data-tab="homeTab"><i class="fa-solid fa-house"></i> <span>الرئيسية</span></li>
+            <li data-tab="clientPortalTab"><i class="fa-solid fa-user"></i> <span>الزبون</span></li>
+            <li data-tab="driverPortalTab"><i class="fa-solid fa-car"></i> <span>السائق</span></li>
+        </ul>
+        <div class="sidebar-footer">
+            <span>وادي الشاطئ © 2026</span>
+        </div>
+    </div>
 
-    <div id="mainContainer">
-        <section class="hero">
-            <h2>مرحبا بكم في جامعة المنارة العلمية الاهلية</h2>
-            <p>صرحٌ علمي يرسّخ المعرفة، ويصنع الكفاءات، ويسهم في بناء مستقبلٍ أفضل.</p>
-        </section>
+    <div class="main-content">
+        <header>
+            <div class="header-title">
+                <h1><i class="fa-solid fa-car-side"></i> وصلني الشاطئ - المنظومة الذكية</h1>
+            </div>
+            <div class="status-badge">
+                <span class="status-dot" id="connectionDot"></span>
+                <span id="connectionText">جاري الاتصال...</span>
+            </div>
+        </header>
 
         <div class="container">
-            <div id="departments" class="section-box">
-                <h3>الأقسام العلمية والمقررات الدراسية (حسب اللائحة المعتمدة)</h3>
-                <div class="list-items">
-                    <div class="list-item" onclick="openDepartment('business')">قسم إدارة الأعمال</div>
-                    <div class="list-item" onclick="openDepartment('accounting')">قسم المحاسبة</div>
-                    <div class="list-item" onclick="openDepartment('law')">قسم القانون</div>
+
+            <!-- الرئيسية -->
+            <div id="homeTab" class="card active">
+                <div class="hero-banner">
+                    <h1>وصلني الشاطئ</h1>
+                    <p>خدمات التنقل والتوصيل الفورية في كافة مناطق وادي الشاطئ</p>
+                    <p style="margin-top: 8px; font-size: 0.9rem; color: #e2e8f0; font-weight: bold;"><i class="fa-solid fa-shield-halved"></i> التطبيق المحلي وامن</p>
+                </div>
+
+                <!-- شريط تنزيل الملفات المرفوعة من الإدارة -->
+                <div class="downloads-ticker">
+                    <div>
+                        <i class="fa-solid fa-cloud-arrow-down" style="font-size: 1.3rem; margin-left: 8px;"></i>
+                        <strong>الملفات والتطبيقات العامة للإدارة:</strong>
+                    </div>
+                    <div id="publicDownloadsBar" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <span style="font-size: 0.85rem;">لا توجد ملفات مرفوعة حالياً.</span>
+                    </div>
+                </div>
+
+                <div class="whatsapp-alert">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <div>
+                        <strong>تنبيه هامة:</strong> للحصول على كروت الشحن، يمكنك مراسلة الإدارة مباشرة عبر رقم الواتساب: <a href="https://wa.me/218913368086" target="_blank" style="font-weight: bold; color: #047857; text-decoration: underline;">0913368086</a>
+                    </div>
+                </div>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <h3><i class="fa-solid fa-box"></i> توصيل الطلبات</h3>
+                        <p>توصيل آمن وسريع لطلباتك.</p>
+                        <button class="btn" style="margin-top:12px;" onclick="switchTab('clientPortalTab')">اطلب توصيل</button>
+                    </div>
+                    <div class="service-card">
+                        <h3><i class="fa-solid fa-taxi"></i> خدمة التاكسي</h3>
+                        <p>راحة وأمان في كل مشوار داخل المنطقة.</p>
+                        <button class="btn btn-success" style="margin-top:12px;" onclick="switchTab('clientPortalTab')">اطلب تكسي</button>
+                    </div>
                 </div>
             </div>
 
-            <div id="administrations" class="section-box">
-                <h3>الإدارات والمكاتب الرئيسية</h3>
-                <div class="list-items">
-                    <div class="list-item" style="cursor:default;">إدارة رئيس الجامعة</div>
-                    <div class="list-item" style="cursor:default;">مكتب التسجيل والقبول</div>
-                    <div class="list-item" style="cursor:default;">مكتب الدراسة والامتحانات</div>
-                    <div class="list-item" style="cursor:default;">الشؤون المالية</div>
+            <!-- لوحة الزبون -->
+            <div id="clientPortalTab" class="card">
+                <h2 class="section-title">لوحة خدمات الزبون</h2>
+                <div class="whatsapp-alert">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <div>لطلب كروت الشحن، راسل الإدارة عبر واتساب: <a href="https://wa.me/218913368086" target="_blank" style="font-weight:bold; color:#047857;">0913368086</a></div>
+                </div>
+                <div class="sub-switch-btns" id="clientAuthSwitchBtns">
+                    <button class="sub-btn active" id="clientLoginSwitchBtn">تسجيل الدخول</button>
+                    <button class="sub-btn" id="clientRegSwitchBtn">حساب جديد</button>
+                </div>
+
+                <div id="clientLoginBox" class="form-section active" style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="clientLoginPhone" placeholder="091xxxxxxx"></div>
+                    <div class="form-group"><label>الرقم السري:</label><input type="password" id="clientLoginPin" placeholder="الرقم السري"></div>
+                    <button class="btn btn-success" id="clientLoginBtn">دخول</button>
+                </div>
+
+                <div id="clientRegisterBox" class="form-section" style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="clientRegName" placeholder="الاسم الكامل"></div>
+                    <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="clientRegPhone" placeholder="091xxxxxxx"></div>
+                    <div class="form-group"><label>الرقم السري:</label><input type="password" id="clientRegPin" placeholder="رقم سري"></div>
+                    <div class="form-group"><label>رقم الهوية الشخصية:</label><input type="text" id="clientRegIdNumber" placeholder="رقم الهوية الوطنية أو جواز السفر"></div>
+                    <div class="form-group"><label>مكان الإصدار:</label><input type="text" id="clientRegIdPlace" placeholder="مكان الإصدار"></div>
+                    <div class="form-group"><label>تاريخ الإصدار:</label><input type="date" id="clientRegIdDate"></div>
+                    
+                    <div class="legal-box">
+                        <label><input type="checkbox" id="clientLegalCheck"> أُقرّ أنا الزبون بأن جميع البيانات والمعلومات التي قمت بإدخالها صحيحة وكاملة، وأتعهد باستخدام التطبيق بصورة مشروعة، وأتحمل كامل المسؤولية القانونية عن أي بيانات غير صحيحة أو وهمية أو أي إساءة في استخدام التطبيق، وفقًا للتشريعات واللوائح المعمول بها.</label>
+                    </div>
+                    <button class="btn btn-success" id="clientRegBtn">إرسال طلب تسجيل الزبون</button>
+                </div>
+
+                <div id="clientDashboardArea" style="display:none;">
+                    <div style="background: linear-gradient(135deg, #004080, #006699); color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <p style="font-size: 0.9rem;">مرحباً: <span id="clientWelcomeName" style="font-weight:bold;"></span></p>
+                            <p style="margin-top: 3px; font-size: 0.8rem;">رصيد المحفظة: <span id="clientWalletDisplay" style="font-weight: bold; color: #ff9900;">0</span> د.ل | الرحلات: <span id="clientTripsCount" style="color:#ff9900; font-weight:bold;">0</span></p>
+                        </div>
+                        <button class="btn btn-danger" style="width: auto; padding: 6px 12px; font-size: 0.8rem;" id="clientLogoutBtn2">خروج</button>
+                    </div>
+
+                    <div style="background: #fffbeb; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #fde68a;">
+                        <h3 style="color: #b45309; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-ticket"></i> شحن المحفظة بكارت مسبق الدفع</h3>
+                        <p style="font-size: 0.8rem; color:#b45309; margin-bottom:8px;">للحصول على كروت الشحن، راسل الإدارة عبر واتساب: <a href="https://wa.me/218913368086" target="_blank" style="font-weight:bold;">0913368086</a></p>
+                        <div class="form-group"><label>أدخل كود الكرت:</label><input type="text" id="rechargeCardCode" placeholder="WAS-xxxx"></div>
+                        <button class="btn btn-success" style="background: #b45309;" id="submitRechargeBtn">تفعيل الكرت وشحن الرصيد فوراً</button>
+                    </div>
+
+                    <div style="background: #f0fdf4; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #bbf7d0;">
+                        <h3 style="color: #166534; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-money-bill-transfer"></i> تحويل رصيد للسائق من محفظتك</h3>
+                        <div class="form-group"><label>رقم هاتف السائق:</label><input type="tel" id="transferDriverPhone" placeholder="091xxxxxxx"></div>
+                        <div class="form-group"><label>المبلغ المراد تحويله (د.ل):</label><input type="number" id="transferAmount" placeholder="أدخل المبلغ"></div>
+                        <button class="btn btn-success" style="background: #166534;" id="submitTransferBtn">تحويل الرصيد فوراً للسائق</button>
+                    </div>
+
+                    <div style="background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
+                        <h3 style="font-size: 1rem; color: var(--primary-dark); margin-bottom: 10px;">طلب رحلة أو خدمة جديدة</h3>
+                        <div class="form-group">
+                            <label>نوع الخدمة:</label>
+                            <select id="serviceType" onchange="toggleCargoField()">
+                                <option value="توصيل ركاب (تكسي)">توصيل ركاب (تكسي)</option>
+                                <option value="توصيل طلبات">توصيل طلبات</option>
+                                <option value="طلب سيارة نقل">طلب سيارة نقل (بضائع / أثاث - السعر بالاتفاق)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>نوع الجنس (للطلب):</label>
+                            <select id="clientGenderType">
+                                <option value="رجالي / عادي">رحلة عادية أو رجالية (تظهر للسائقين الرجال)</option>
+                                <option value="انثى">رحلة نسائية خاصة (تظهر للسائقات النساء فقط)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="cargoDetailsGroup" style="display: none; background: #f0fdf4; padding: 10px; border-radius: 8px; border: 1px solid #bbf7d0;">
+                            <label style="color: #166534;"><i class="fa-solid fa-box-open"></i> تفاصيل المطلوب نقله:</label>
+                            <textarea id="cargoDetailsInput" rows="2" placeholder="اكتب تفاصيل الحمولة أو الأثاث..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>موقع الانطلاق:</label>
+                            <select id="pickupLocation" onchange="checkLocationPricing()"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>الوجهة المقصودة:</label>
+                            <select id="dropoffLocation" onchange="checkLocationPricing()"></select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>السعر المحدد من الإدارة للمسار:</label>
+                            <input type="text" id="clientFinalCalculatedPrice" readonly style="background: #edf2f7; font-weight: bold; color: var(--primary-dark);" value="10 د.ل (داخل المنطقة)">
+                        </div>
+
+                        <div class="form-group">
+                            <label>طريقة الدفع:</label>
+                            <select id="paymentMethod">
+                                <option value="كاش">نقدي (كاش)</option>
+                                <option value="محفظة">رصيد المحفظة</option>
+                                <option value="بطاقة أو حوالة">بطاقة أو حوالة مصرفية</option>
+                            </select>
+                        </div>
+
+                        <button class="btn" id="sendOrderBtn">إرسال الطلب فوراً للسائقين</button>
+                    </div>
+                </div>
+
+                <div id="clientOrdersWrapper" style="display:none; background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 15px;">
+                    <h3 style="font-size: 1rem; margin-bottom: 8px; color: var(--primary-dark);">طلباتي الحالية ومتابعة التتبع:</h3>
+                    <div id="clientActiveOrdersList"></div>
                 </div>
             </div>
+
+            <!-- لوحة السائق -->
+            <div id="driverPortalTab" class="card">
+                <h2 class="section-title">لوحة تحكم السائقين</h2>
+                <div class="whatsapp-alert">
+                    <i class="fa-brands fa-whatsapp"></i>
+                    <div>لطلب كروت الشحن، راسل الإدارة عبر واتساب: <a href="https://wa.me/218913368086" target="_blank" style="font-weight:bold; color:#047857;">0913368086</a></div>
+                </div>
+                <div class="sub-switch-btns" id="driverAuthSwitchBtns">
+                    <button class="sub-btn active" id="driverLoginSwitchBtn">تسجيل الدخول</button>
+                    <button class="sub-btn" id="driverRegSwitchBtn">تسجيل كابتن جديد</button>
+                </div>
+
+                <div id="driverLoginBox" class="form-section active" style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <div class="form-group"><label>رقم هاتف (واتساب):</label><input type="tel" id="driverLoginPhone" placeholder="091xxxxxxx"></div>
+                    <button class="btn btn-success" id="driverLoginBtn">دخول الكابتن</button>
+                </div>
+
+                <div id="driverRegisterBox" class="form-section" style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="driverRegName" placeholder="الاسم الكامل"></div>
+                    <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="driverRegPhone" placeholder="091xxxxxxx"></div>
+                    <div class="form-group"><label>نوع السيارة:</label><input type="text" id="driverRegCar" placeholder="نوع السيارة (مثال: تويوتا كورولا)"></div>
+                    <div class="form-group"><label>رقم المركبة (اللوحة المعدنية):</label><input type="text" id="driverRegCarPlate" placeholder="رقم اللوحة المعدنية"></div>
+                    
+                    <div class="form-group">
+                        <label>تصنيف السائق (الجنس):</label>
+                        <select id="driverRegGender">
+                            <option value="ذكر">ذكر (يستقبل الطلبات العادية والرجالية والنقل)</option>
+                            <option value="انثى">انثى (تستقبل رحلات التكسي وتوصيل الطلبات النسائية والنقل فقط)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group"><label>رقم الهوية الشخصية:</label><input type="text" id="driverRegIdNumber" placeholder="رقم الهوية الوطنية أو جواز السفر"></div>
+                    <div class="form-group"><label>مكان الإصدار:</label><input type="text" id="driverRegIdPlace" placeholder="مكان الإصدار"></div>
+                    <div class="form-group"><label>تاريخ الإصدار:</label><input type="date" id="driverRegIdDate"></div>
+
+                    <div class="form-group"><label><i class="fa-solid fa-car"></i> صورة السيارة (إلزامي):</label><input type="file" id="driverFileCar" accept="image/*" required></div>
+                    <div class="form-group"><label><i class="fa-solid fa-passport"></i> جواز السفر أو الهوية - صورة (إلزامي):</label><input type="file" id="driverFilePassport" accept="image/*" required></div>
+                    <div class="form-group"><label><i class="fa-solid fa-book"></i> كتيب المركبة - صورة (إلزامي):</label><input type="file" id="driverFileBook" accept="image/*" required></div>
+
+                    <div class="legal-box">
+                        <label><input type="checkbox" id="driverLegalCheck"> أُقرّ أنا السائق بأن جميع البيانات والمعلومات والمستندات التي قمت بتقديمها للتسجيل في التطبيق صحيحة وكاملة، وأتعهد بالالتزام بأنظمة وقواعد استخدام التطبيق، وحسن التعامل مع الزبائن، والمحافظة على سلامتهم وممتلكاتهم، وعدم إساءة استخدام التطبيق أو استغلاله لأي أغراض غير مشروعة. كما أتحمل كامل المسؤولية القانونية عن أي بيانات غير صحيحة أو وهمية، أو أي مخالفة أو إساءة استخدام تصدر مني أثناء استخدام التطبيق أو تقديم خدمات النقل والتوصيل.</label>
+                    </div>
+                    <button class="btn btn-success" id="driverRegBtn">إرسال طلب الانضمام للموافقة</button>
+                </div>
+
+                <div id="driverDashboardArea" style="display:none;">
+                    <div style="background: linear-gradient(135deg, #004080, #006699); color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+                        <p style="font-size: 0.9rem;">الكابتن: <span id="driverWelcomeName" style="font-weight:bold;"></span> (<span id="driverGenderDisplay" style="color:#ff9900;"></span>)</p>
+                        <p style="margin-top: 5px; font-size: 0.85rem;">رصيد المحفظة: <span id="driverWalletBalance" style="font-weight:bold; color: #ff9900;">0</span> د.ل | الرحلات المنجزة: <span id="driverTripsCount" style="font-weight:bold; color:#ff9900;">0</span></p>
+                        <div id="driverBadgeBox" style="margin-top: 5px; font-size: 0.85rem; color: #ffebd2; font-weight: bold;"></div>
+                        <button class="btn btn-danger" style="width: auto; padding: 5px 10px; font-size: 0.75rem; margin-top: 8px;" id="driverLogoutBtn">خروج</button>
+                    </div>
+
+                    <div style="background: #fffbeb; border: 1px solid #fde68a; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; color: #b45309;">
+                        <i class="fa-solid fa-award" style="color: #d97706; font-size: 1.1rem;"></i> <strong>ملاحظة تحفيزية للكابتن:</strong> سيحصل الكابتن على <strong>نجمة تقديرية (⭐) ورصيد مجاني في المحفظة</strong> فور وصوله وإنجازه لعدد <strong>30 رحلة</strong> بنجاح!
+                    </div>
+
+                    <div style="background: #fffbeb; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #fde68a;">
+                        <h3 style="color: #b45309; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-ticket"></i> شحن محفظة الكابتن بكارت مسبق الدفع (خصم 1 د.ل رسوم تشغيل)</h3>
+                        <p style="font-size: 0.8rem; color:#b45309; margin-bottom:8px;">لطلب كروت الشحن، راسل الإدارة عبر واتساب: <a href="https://wa.me/218913368086" target="_blank" style="font-weight:bold;">0913368086</a></p>
+                        <div class="form-group"><label>أدخل كود الكرت:</label><input type="text" id="driverRechargeCardCode" placeholder="WAS-xxxx"></div>
+                        <button class="btn btn-success" style="background: #b45309;" id="driverSubmitRechargeBtn">تفعيل الكرت وشحن المحفظة</button>
+                    </div>
+
+                    <div style="margin-bottom: 12px; background: #e0f2fe; padding: 10px; border-radius: 8px; display:flex; gap:8px;">
+                        <button class="btn btn-success" style="padding: 8px; font-size: 0.85rem; flex:1;" id="shareLocationBtn"><i class="fa-solid fa-location-crosshairs"></i> مشاركة موقعي (GPS)</button>
+                        <button class="btn" style="padding: 8px; font-size: 0.85rem; flex:1; background:#0369a1;" id="enableNotifBtn"><i class="fa-solid fa-bell"></i> التنبيهات الصوتية مفعلة</button>
+                    </div>
+
+                    <div style="background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; margin-bottom: 15px;">
+                        <h3 style="font-size: 0.95rem; color: var(--primary-dark); margin-bottom: 6px;"><i class="fa-solid fa-file-invoice-dollar"></i> كشف الحساب الشخصي للكابتن</h3>
+                        <div id="driverPersonalStatement" style="font-size: 0.85rem; color: #475569;">لا توجد معاملات مالية بعد.</div>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <h3 style="font-size: 1rem; color: var(--primary-dark); margin-bottom: 8px;">الطلبات المتاحة (تلقائية بدون موافقة إدارية للرحلات)</h3>
+                        <div id="driversOrdersList"></div>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 1rem; color: var(--primary-dark); margin-bottom: 8px;">كشف الرحلات وتواصل العملاء</h3>
+                        <div id="driverTripHistoryList"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- لوحة الإدارة العليا -->
+            <div id="adminTab" class="card">
+                
+                <div id="adminLoginBox" class="form-group" style="background: #fffbeb; padding: 25px; border-radius: 10px; border: 1px solid #fde68a; max-width: 500px; margin: 30px auto;">
+                    <h2 style="color: #92400e; margin-bottom: 15px; font-size: 1.2rem;"><i class="fa-solid fa-lock"></i> تسجيل دخول لوحة الإدارة العليا</h2>
+                    <label style="color: #92400e;">اسم المستخدم:</label>
+                    <input type="text" id="adminUsernameInput" placeholder="اسم المستخدم" style="margin-bottom:12px;">
+                    <label style="color: #92400e;">كلمة المرور:</label>
+                    <input type="password" id="adminPinInput" placeholder="كلمة المرور">
+                    <button class="btn" style="margin-top:15px; background: #92400e;" id="adminLoginBtn">دخول الإدارة</button>
+                </div>
+                
+                <div id="adminContentPanel" style="display:none;">
+                    
+                    <div class="admin-top-bar">
+                        <h2><i class="fa-solid fa-gauge-high" style="color:#0284c7;"></i> لوحة تحكم الإدارة العليا</h2>
+                        <button class="btn btn-danger" style="width: auto; padding: 8px 16px; font-size: 0.85rem;" id="adminLogoutBtn">خروج الإدارة</button>
+                    </div>
+
+                    <div class="admin-nav-tabs">
+                        <button class="admin-tab-btn active" onclick="switchAdminSection('revenues')">الإيرادات</button>
+                        <button class="admin-tab-btn" onclick="switchAdminSection('requests')">الطلبات</button>
+                        <button class="admin-tab-btn" onclick="switchAdminSection('regions')">المناطق</button>
+                        <button class="admin-tab-btn" onclick="switchAdminSection('cards')">الكروت</button>
+                        <button class="admin-tab-btn" onclick="switchAdminSection('users')">المستخدمين</button>
+                        <button class="admin-tab-btn" onclick="switchAdminSection('uploads')">الملفات العامة</button>
+                        <button class="admin-tab-btn" onclick="switchAdminSection('admins')">الأدمنز</button>
+                        <button class="admin-tab-btn" onclick="switchAdminSection('logs')">السجل</button>
+                    </div>
+
+                    <div id="adminSec_revenues" class="admin-sub-section" style="margin-top: 15px;">
+                        <div style="background: #ecfdf5; padding: 20px; border-radius: 10px; border: 1px solid #a7f3d0; margin-bottom: 15px;">
+                            <h3 style="color: #065f46; margin-bottom: 8px; font-size: 1.1rem;"><i class="fa-solid fa-vault"></i> إجمالي الإيرادات الموحدة للتطبيق</h3>
+                            <p style="font-size: 1.8rem; font-weight: bold; color: #047857;" id="adminTotalRevenueDisplay">0 د.ل</p>
+                        </div>
+                        <div style="background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1;">
+                            <h3 style="color: #0f172a; margin-bottom: 10px; font-size: 1rem;"><i class="fa-solid fa-list-check"></i> تفصيل عمليات الإيرادات</h3>
+                            <div id="adminRevenueDetailsTable" style="max-height: 250px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+
+                    <div id="adminSec_requests" class="admin-sub-section" style="margin-top: 15px; display: none;">
+                        <div style="background: #eef2ff; padding: 15px; border-radius: 10px; border: 1px solid #c7d2fe;">
+                            <h3 style="color: #3730a3; margin-bottom: 10px; font-size: 1.05rem;"><i class="fa-solid fa-clipboard-check"></i> طلبات التسجيل والمستندات المحفوظة</h3>
+                            <div id="adminPendingRegistrationsList" style="max-height: 350px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+
+                    <div id="adminSec_regions" class="admin-sub-section" style="margin-top: 15px; display: none;">
+                        <div style="background: #f0fdf4; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #bbf7d0;">
+                            <h3 style="color: #166534; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-map-pin"></i> إضافة منطقة أو مدينة جديدة للنظام</h3>
+                            <div class="form-group"><input type="text" id="newRegionInput" placeholder="أدخل اسم المنطقة الجديدة"></div>
+                            <button class="btn btn-success" style="background: #166534;" id="addNewRegionBtn">حفظ وإضافة المنطقة</button>
+                        </div>
+                        <div style="background: #e0f2fe; padding: 15px; border-radius: 10px; border: 1px solid #7dd3fc;">
+                            <h3 style="color: #0369a1; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-route"></i> تسعير المسارات</h3>
+                            <div class="form-group"><label>من منطقة:</label><select id="pricingPickup"></select></div>
+                            <div class="form-group"><label>إلى منطقة:</label><select id="pricingDropoff"></select></div>
+                            <div class="form-group"><label>السعر (د.ل):</label><input type="number" id="pricingAmount" placeholder="السعر"></div>
+                            <button class="btn btn-success" style="background: #0369a1;" id="saveRoutePriceBtn">حفظ السعر</button>
+                            <div id="adminSavedPricingTable" style="max-height: 180px; overflow-y: auto; margin-top:10px;"></div>
+                        </div>
+                    </div>
+
+                    <div id="adminSec_cards" class="admin-sub-section" style="margin-top: 15px; display: none;">
+                        <div style="background: #fef3c7; padding: 15px; border-radius: 10px; border: 1px solid #f59e0b;">
+                            <h3 style="color: #b45309; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-ticket"></i> إصدار الكروت وصلاحية 30 يوم</h3>
+                            <div class="form-group"><label>بادئة الكود:</label><input type="text" id="batchPrefix" value="WAS"></div>
+                            <div class="form-group"><label>العدد:</label><input type="number" id="batchCount" value="10"></div>
+                            <div class="form-group"><label>القيمة (د.ل):</label><input type="number" id="batchValue" value="20"></div>
+                            <button class="btn btn-success" style="background: #b45309; margin-bottom: 10px;" id="generateBatchCardsBtn">توليد الكروت</button>
+                            <div id="adminCardsListTable" style="max-height: 200px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+
+                    <div id="adminSec_users" class="admin-sub-section" style="margin-top: 15px; display: none;">
+                        <div style="background: #e6fffa; padding: 15px; border-radius: 10px; border: 1px solid #319795;">
+                            <h3 style="color: #234e52; margin-bottom: 8px; font-size: 1.05rem;"><i class="fa-solid fa-users"></i> كشف شامل بالمستخدمين</h3>
+                            <h4 style="font-size:0.9rem; color:#2c7a7b; margin-top:5px;">قائمة الزبائن المعتمدين:</h4>
+                            <div id="adminClientsTable" style="max-height: 180px; overflow-y: auto; margin-bottom:15px;"></div>
+                            <h4 style="font-size:0.9rem; color:#2c7a7b;">قائمة السائقين المعتمدين:</h4>
+                            <div id="adminDriversWalletTable" style="max-height: 180px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+
+                    <!-- قسم رفع الملفات العامة ليقوم العامة بتنزيلها -->
+                    <div id="adminSec_uploads" class="admin-sub-section" style="margin-top: 15px; display: none;">
+                        <div style="background: #e0f2fe; padding: 15px; border-radius: 10px; border: 1px solid #7dd3fc;">
+                            <h3 style="color: #0369a1; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-file-arrow-up"></i> رفع ملف أو تطبيق عام (ليقوم العامة بتنزيله)</h3>
+                            <div class="form-group"><label>عنوان الملف (مثال: تطبيق السائق APK الإصدار الأخير):</label><input type="text" id="uploadFileTitle" placeholder="اسم الملف أو الوصف"></div>
+                            <div class="form-group"><label>اختر الملف:</label><input type="file" id="uploadFileInput"></div>
+                            <button class="btn btn-success" style="background: #0369a1;" id="uploadPublicFileBtn">رفع ونشر الملف للعامة</button>
+                        </div>
+                        <div style="background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 15px;">
+                            <h3 style="color: #0f172a; margin-bottom: 8px; font-size: 1rem;">الملفات المنشورة حالياً:</h3>
+                            <div id="adminPublicFilesTable" style="max-height: 200px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+
+                    <!-- قسم إدارة الأدمنز مع إمكانية الحذف وتغيير الرقم السري للإدارة -->
+                    <div id="adminSec_admins" class="admin-sub-section" style="margin-top: 15px; display: none;">
+                        <div style="background: #fffbeb; padding: 15px; border-radius: 10px; border: 1px solid #fde68a; margin-bottom: 15px;">
+                            <h3 style="color: #b45309; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-key"></i> تغيير كلمة المرور للوحة الإدارة العليا</h3>
+                            <div class="form-group"><label>كلمة المرور الجديدة:</label><input type="password" id="newAdminPinPass" placeholder="أدخل الرقم السري الجديد"></div>
+                            <button class="btn btn-success" style="background: #b45309;" id="updateAdminPinBtn">حفظ وتحديث الرقم السري</button>
+                        </div>
+
+                        <div style="background: #fdf4ff; padding: 15px; border-radius: 10px; border: 1px solid #f0abfc;">
+                            <h3 style="color: #86198f; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-user-shield"></i> كشف وإدارة المشرفين الفرعيين (الأدمنز)</h3>
+                            <div class="form-group"><input type="text" id="newAdminUser" placeholder="اسم المستخدم للمشرف الجديد"></div>
+                            <div class="form-group"><input type="password" id="newAdminPass" placeholder="كلمة المرور"></div>
+                            <button class="btn btn-success" style="background: #86198f; margin-bottom: 10px;" id="addNewAdminBtn">إنشاء مشرف جديد</button>
+                            <h4 style="font-size:0.9rem; color:#86198f; margin-top:10px;">المشرفون المسجلون:</h4>
+                            <div id="adminSubAdminsTable" style="max-height: 180px; overflow-y: auto;"></div>
+                        </div>
+
+                        <div style="background: #fff5f5; padding: 15px; border-radius: 10px; margin-top: 15px; border: 2px dashed #feb2b2;">
+                            <h3 style="color: #c53030; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-triangle-exclamation"></i> صيانة: تصفير التطبيق بالكامل</h3>
+                            <button class="btn btn-danger" id="factoryResetBtn">تصفير وإعادة ضبط النظام بالكامل</button>
+                        </div>
+                    </div>
+
+                    <div id="adminSec_logs" class="admin-sub-section" style="margin-top: 15px; display: none;">
+                        <div style="background: #fafaf9; padding: 15px; border-radius: 10px; border: 1px solid #e7e5e4;">
+                            <h3 style="color: #44403c; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-clock-rotate-left"></i> السجل التاريخي للعمليات</h3>
+                            <div id="adminSystemLogTable" style="max-height: 300px; overflow-y: auto;"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
+        <footer>
+            <p>التطبيق المحلي وامن | جميع الحقوق محفوظة © 2026 - وصلني الشاطئ | للاستفسار والشحن واتساب: <a href="https://wa.me/218913368086" target="_blank" style="color:var(--primary); font-weight:bold;">0913368086</a></p>
+        </footer>
     </div>
-
-    <div class="container">
-        <!-- عرض المقررات والأقسام -->
-        <div id="departmentPage" class="page-content">
-            <a class="back-btn" onclick="showMainHome()">← العودة للرئيسية</a>
-            <h2 id="deptTitle">عنوان القسم</h2>
-            <p id="deptDesc" style="margin-bottom: 20px; color: #555; line-height: 1.6;"></p>
-            <h3 style="color: #0b2545; margin-bottom: 10px;">المقررات الدراسية المعتمدة:</h3>
-            <table>
-                <thead>
-                    <tr><th>م</th><th>رقم المقرر</th><th>اسم المقرر الدراسي</th></tr>
-                </thead>
-                <tbody id="coursesTableBody"></tbody>
-            </table>
-        </div>
-
-        <!-- نافذة التحقق من كلمة المرور للبوابات -->
-        <div id="portalLoginWrapper" class="page-content" style="display:none;">
-            <a class="back-btn" onclick="showMainHome()">← العودة للرئيسية</a>
-            <div class="login-box">
-                <h3 id="loginTitleModal">تسجيل الدخول للبوابة</h3>
-                <p style="font-size:13px; color:#666; margin-bottom:15px;">يجب إدخال كلمة المرور المعتمدة للوصول لهذه البوابة.</p>
-                <div class="form-group"><label>اسم المستخدم أو رقم القيد:</label><input type="text" id="portalUser" placeholder="أدخل المعرّف"></div>
-                <div class="form-group"><label>كلمة المرور:</label><input type="password" id="portalPass" placeholder="كلمة المرور"></div>
-                <button class="btn-main" onclick="verifyPortalLogin()">دخول آمن</button>
-            </div>
-        </div>
-
-        <!-- 1. بوابة الطلبة (طلب تسجيل + استعراض السجل الدراسي) -->
-        <div id="studentPage" class="page-content" style="display:none;">
-            <a class="back-btn" onclick="showMainHome()">← تسجيل الخروج</a>
-            <h2>بوابة الطلبة - السجل الدراسي والتسجيل</h2>
-            
-            <div style="background:#fff; padding:15px; border:1px solid #ddd; border-radius:6px; margin-bottom:25px;">
-                <h3 style="color:#0b2545; font-size:16px; margin-bottom:10px;">تقديم طلب تسجيل جديد (لغير المسجلين):</h3>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                    <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="stName" placeholder="اسم الطالب"></div>
-                    <div class="form-group"><label>رقم القيد المقترح:</label><input type="text" id="stID" placeholder="مثال: 2026101"></div>
-                </div>
-                <div class="form-group"><label>القسم الدراسي:</label>
-                    <select id="stDept">
-                        <option value="business">قسم إدارة الأعمال</option>
-                        <option value="accounting">قسم المحاسبة</option>
-                        <option value="law">قسم القانون</option>
-                    </select>
-                </div>
-                <button class="btn-main" onclick="submitStudentRegistration()">إرسال طلب التسجيل للإدارة</button>
-            </div>
-
-            <hr style="margin:20px 0; border:0; border-top:1px solid #ddd;">
-
-            <div>
-                <h3 style="color:#0b2545; font-size:18px; margin-bottom:10px;">الاستعلام عن السجل الدراسي (يتطلب موافقة الإدارة وسداد الرسوم):</h3>
-                <div style="display:flex; gap:10px; max-width:500px; margin-bottom:15px;">
-                    <input type="text" id="checkStID" placeholder="أدخل رقم القيد الخاص بك" style="padding:10px; border:1px solid #ccc; border-radius:4px; flex:1;">
-                    <button class="btn-main" style="width:auto;" onclick="checkStudentRecord()">استعراض السجل الدراسي</button>
-                </div>
-                <div id="studentRecordDisplay"></div>
-            </div>
-        </div>
-
-        <!-- 2. بوابة الموظفين -->
-        <div id="employeePage" class="page-content" style="display:none;">
-            <a class="back-btn" onclick="showMainHome()">← تسجيل الخروج</a>
-            <h2>بوابة الموظفين - تسجيل الطلبة</h2>
-            <div style="max-width: 600px;">
-                <div class="form-group"><label>اسم الطالب الكامل:</label><input type="text" id="empStName" placeholder="اسم الطالب"></div>
-                <div class="form-group"><label>رقم القيد:</label><input type="text" id="empStID" placeholder="رقم القيد"></div>
-                <div class="form-group"><label>القسم:</label>
-                    <select id="empStDept">
-                        <option value="business">قسم إدارة الأعمال</option>
-                        <option value="accounting">قسم المحاسبة</option>
-                        <option value="law">قسم القانون</option>
-                    </select>
-                </div>
-                <button class="btn-main" onclick="employeeRegisterStudent()">حفظ الطالب بالمنظومة</button>
-            </div>
-        </div>
-
-        <!-- 3. بوابة أعضاء هيئة التدريس -->
-        <div id="facultyPage" class="page-content" style="display:none;">
-            <a class="back-btn" onclick="showMainHome()">← تسجيل الخروج</a>
-            <h2>بوابة أعضاء هيئة التدريس - رصد الدرجات</h2>
-            <div style="max-width: 600px;">
-                <div class="form-group"><label>رقم قيد الطالب:</label><input type="text" id="facStID" placeholder="رقم القيد"></div>
-                <div class="form-group"><label>اسم المقرر / المادة:</label><input type="text" id="facSubject" placeholder="اسم المادة"></div>
-                <div class="form-group"><label>الدرجة النهائية أو التقدير:</label><input type="text" id="facGrade" placeholder="مثال: ناجح / 85 / ممتاز"></div>
-                <button class="btn-main" onclick="saveStudentGrade()">رصد وحفظ في السجل الدراسي</button>
-            </div>
-        </div>
-
-        <!-- 4. بوابة الإدارة (الأدمن) -->
-        <div id="adminPage" class="page-content" style="display:none;">
-            <a class="back-btn" onclick="showMainHome()">← تسجيل الخروج</a>
-            <h2>بوابة الإدارة - مراجعة واعتماد طلبات التسجيل</h2>
-            <table>
-                <thead>
-                    <tr><th>م</th><th>اسم الطالب</th><th>رقم القيد</th><th>القسم</th><th>الحالة</th><th>إجراءات الإدارة</th></tr>
-                </thead>
-                <tbody id="requestsTableBody"></tbody>
-            </table>
-        </div>
-    </div>
-
-    <footer>
-        <p>جميع الحقوق محفوظة © 2026 - جامعة المنارة العلمية الأهلية</p>
-    </footer>
 
     <script>
-        // قواعد البيانات والمقررات للأقسام الثلاثة كاملة
-        const departmentsData = {
-            business: {
-                title: "قسم إدارة الأعمال",
-                desc: "المقررات الدراسية المعتمدة لقسم إدارة الأعمال.",
-                courses: [
-                    {code: "ENG 100", name: "اللغة الإنجليزية (1)"}, {code: "ECO 111", name: "الاقتصاد الكلي"},
-                    {code: "MAN 120", name: "مبادئ إدارة الأعمال"}, {code: "ECO 110", name: "الاقتصاد الجزئي"},
-                    {code: "ACC 130", name: "مبادئ المحاسبة (1)"}, {code: "ECO 171", name: "رياضيات مالية وعامة"},
-                    {code: "PSY 106", name: "مهارات التعلم الذاتي"}, {code: "AR 100", name: "اللغة العربية (1)"},
-                    {code: "ENG 101", name: "اللغة الإنجليزية (2)"}, {code: "ECO 140", name: "مبادئ الإحصاء"},
-                    {code: "ECO 210", name: "الاقتصاد التحليلي الجزئي"}, {code: "LAW 102", name: "القانون المدني"},
-                    {code: "MAN 151", name: "مبادئ الإدارة العامة"}, {code: "AR 101", name: "اللغة العربية (2)"},
-                    {code: "ACC 131", name: "مبادئ المحاسبة (2)"}, {code: "MAN 220", name: "إدارة العمليات الإنتاجية"},
-                    {code: "ACC 231", name: "المحاسبة المتوسطة (2)"}, {code: "SOC 300", name: "طرق البحث العلمي"},
-                    {code: "MAN 223", name: "إدارة الأفراد / الموارد البشرية"}, {code: "MAN 321", name: "بحوث العمليات"},
-                    {code: "MAN 421", name: "الإدارة الاستراتيجية"}, {code: "ECO 313", name: "النقود والمصارف"},
-                    {code: "MAN 420", name: "السلوك التنظيمي"}, {code: "MAN 426", name: "التسويق الدولي"},
-                    {code: "MAN 365", name: "إدارة المصارف"}, {code: "MAN 429", name: "إدارة الاستثمارات"},
-                    {code: "MAN —", name: "إدارة الشركات والمخازن"}, {code: "FIN —", name: "الإدارة المالية"},
-                    {code: "MAN —", name: "إدارة الجودة"}, {code: "ACC 332", name: "محاسبة التكاليف (1)"},
-                    {code: "ACC 434", name: "المحاسبة الإدارية"}, {code: "MAN —", name: "نظرية التنظيم"},
-                    {code: "MAN —", name: "نظم المعلومات الإدارية"}, {code: "MAN —", name: "السياسات الإدارية"},
-                    {code: "MAN —", name: "إدارة التأمين والمخاطر"}, {code: "MAN —", name: "بحوث العمليات (2)"}
-                ]
-            },
-            accounting: {
-                title: "قسم المحاسبة",
-                desc: "المقررات الدراسية المعتمدة لقسم المحاسبة.",
-                courses: [
-                    {code: "AR100", name: "اللغة العربية (1)"}, {code: "LAW207", name: "القانون المدني"},
-                    {code: "MAN120", name: "مبادئ الإدارة"}, {code: "ACC130", name: "مبادئ المحاسبة (1)"},
-                    {code: "ECO140", name: "مبادئ الإحصاء (1)"}, {code: "PSY106", name: "العلوم السياسية"},
-                    {code: "ISL100", name: "التربية الإسلامية"}, {code: "AR101", name: "اللغة العربية (2)"},
-                    {code: "ECO210", name: "الاقتصاد الجزئي"}, {code: "MAN121", name: "مبادئ الإدارة (2)"},
-                    {code: "ACC131", name: "مبادئ المحاسبة (2)"}, {code: "MAN122", name: "الإدارة العامة"},
-                    {code: "ECO141", name: "مبادئ الإحصاء (2)"}, {code: "ACC230", name: "المحاسبة المتوسطة (1)"},
-                    {code: "FIN201", name: "الرياضة المالية"}, {code: "AST201", name: "الإحصاء التطبيقي"},
-                    {code: "ACC330", name: "محاسبة شركات الأشخاص"}, {code: "ACC432", name: "محاسبة الأقسام والفروع"},
-                    {code: "ACC334", name: "المحاسبة الضريبية"}, {code: "MAN220", name: "الإدارة الإنتاجية"},
-                    {code: "ACC332", name: "محاسبة التكاليف"}, {code: "ACC434", name: "المحاسبة الإدارية"},
-                    {code: "ACC331", name: "محاسبة شركات الأموال"}, {code: "ACC430", name: "مبادئ المراجعة (1)"},
-                    {code: "ACC433", name: "تصميم النظم المحاسبية"}, {code: "ACC435", name: "تحليل القوائم المالية"},
-                    {code: "ACC337", name: "محاسبة المشروعات الخدمية"}, {code: "IT100", name: "برامج Excel"},
-                    {code: "MAN321", name: "بحوث العمليات"}, {code: "ACC333", name: "محاسبة التكاليف المتقدمة"},
-                    {code: "ACC436", name: "المحاسبة الدولية"}, {code: "ACC231", name: "المحاسبة المتوسطة (2)"},
-                    {code: "FIN310", name: "الأسواق المالية"}, {code: "MAN223", name: "إدارة الإعداد"},
-                    {code: "ECO313", name: "النقود والمصارف"}, {code: "ACC437", name: "محاسبة الشركات القابضة"},
-                    {code: "ECO211", name: "الاقتصاد الكلي التحليلي"}, {code: "ACC336", name: "محاسبة المصارف وشركات التأمين"},
-                    {code: "ECO320", name: "المالية العامة"}, {code: "ACC438", name: "دراسات في المحاسبة"},
-                    {code: "ACC335", name: "محاسبة النفط"}
-                ]
-            },
-            law: {
-                title: "قسم القانون",
-                desc: "المقررات الدراسية المعتمدة لقسم القانون.",
-                courses: [
-                    {code: "LAW-01", name: "نظرية القانون"}, {code: "LAW-02", name: "نظرية الحق"},
-                    {code: "LAW-03", name: "القانون الدستوري"}, {code: "LAW-04", name: "مبادئ الاقتصاد"},
-                    {code: "ENG-01", name: "اللغة الإنجليزية"}, {code: "AR-01", name: "اللغة العربية"},
-                    {code: "FIQ-01", name: "مدخل الفقه"}, {code: "LAW-05", name: "تاريخ نظرية التنظيم"},
-                    {code: "LAW-06", name: "النظم السياسية"}, {code: "CRM-01", name: "علم الإجرام"},
-                    {code: "CRM-02", name: "علم العقاب"}, {code: "LAW-07", name: "القانون العام"},
-                    {code: "CRL-01", name: "القانون الجنائي العام"}, {code: "OBL-01", name: "مصادر الالتزام"},
-                    {code: "ADM-01", name: "القانون الإداري"}, {code: "ECO-01", name: "النقود والمصارف"},
-                    {code: "PER-01", name: "الأحوال الشخصية"}, {code: "PIL-01", name: "القانون الدولي العام"},
-                    {code: "CRL-02", name: "القانون الجنائي العام (2)"}, {code: "OBL-02", name: "أحكام الالتزام"},
-                    {code: "ADM-02", name: "القانون الإداري (2)"}, {code: "PIL-02", name: "القانون الدولي (2)"},
-                    {code: "HR-01", name: "حقوق الإنسان"}, {code: "CIV-01", name: "قانون المرافعات"},
-                    {code: "COM-01", name: "القانون التجاري"}, {code: "CRL-03", name: "القانون الجنائي الخاص (1)"},
-                    {code: "INH-01", name: "الميراث والوصية"}, {code: "ADM-03", name: "الرقابة الإدارية"},
-                    {code: "FIN-01", name: "المالية العامة"}, {code: "IR-01", name: "العلاقات الدولية"},
-                    {code: "SOC-01", name: "القانون الاجتماعي"}, {code: "COM-02", name: "القانون التجاري (2)"},
-                    {code: "CIV-02", name: "قانون المرافعات (2)"}, {code: "INH-02", name: "الميراث والوصية (2)"},
-                    {code: "CIV-03", name: "الحقوق المسماة"}, {code: "CRL-04", name: "القانون الجنائي الخاص (2)"},
-                    {code: "CRP-01", name: "الإجراءات الجنائية"}, {code: "IPL-01", name: "القانون الدولي الخاص"},
-                    {code: "CIV-04", name: "الحقوق المسماة (2)"}, {code: "ENF-01", name: "التنفيذ الجبري"},
-                    {code: "TAX-01", name: "تشريعات المالية والضرائب"}, {code: "REAL-01", name: "الحقوق العينية"},
-                    {code: "PIL-03", name: "القانون الدولي العام (2)"}, {code: "ENF-02", name: "التنفيذ الجبري (2)"},
-                    {code: "REAL-02", name: "الحقوق العينية (2)"}, {code: "FIQ-02", name: "أصول الفقه (2)"},
-                    {code: "LAW-08", name: "القانون الخاص (2)"}, {code: "BOR-01", name: "تشريعات الحدود"}
-                ]
+        const firebaseConfig = { databaseURL: "https://waselni-shatea-default-rtdb.firebaseio.com/" };
+        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+        const db = firebase.database();
+
+        let currentClientPhone = null;
+        let currentDriverPhone = null;
+        let currentDriverGender = 'ذكر';
+        let globalRoutesPricing = {};
+        let lastKnownOrderCount = 0;
+
+        let browserInstanceId = localStorage.getItem('waselni_browser_uid');
+        if(!browserInstanceId) {
+            browserInstanceId = 'uid_' + Math.random().toString(36).substring(2) + Date.now();
+            localStorage.setItem('waselni_browser_uid', browserInstanceId);
+        }
+
+        function switchAdminSection(secName) {
+            document.querySelectorAll('.admin-sub-section').forEach(s => s.style.display = 'none');
+            document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+            
+            const targetSec = document.getElementById('adminSec_' + secName);
+            if(targetSec) targetSec.style.display = 'block';
+            
+            event.currentTarget.classList.add('active');
+        }
+
+        document.getElementById('adminLogoutBtn')?.addEventListener('click', () => {
+            document.getElementById('adminContentPanel').style.display = 'none';
+            document.getElementById('adminLoginBox').style.display = 'block';
+            document.getElementById('adminUsernameInput').value = '';
+            document.getElementById('adminPinInput').value = '';
+        });
+
+        function playBeepSoundAndNotify(orderTitle) {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } catch(e) { console.log(e); }
+        }
+
+        function logAdminAction(actionText) {
+            let timeStr = new Date().toLocaleString('ar-LY');
+            db.ref('system_logs').push({ text: actionText, time: timeStr });
+        }
+
+        function addRevenue(amount, description) {
+            db.ref('system_revenues').transaction(current => (current || 0) + amount);
+            let timeStr = new Date().toLocaleString('ar-LY');
+            db.ref('revenue_transactions').push({ amount: amount, description: description, time: timeStr });
+            logAdminAction(`إيراد مضاف: ${amount} د.ل (${description})`);
+        }
+
+        db.ref(".info/connected").on("value", (snap) => {
+            const dot = document.getElementById("connectionDot");
+            const text = document.getElementById("connectionText");
+            if (snap.val() === true) {
+                dot.classList.add("connected");
+                text.innerText = "متصل بالسحابة";
+            } else {
+                dot.classList.remove("connected");
+                text.innerText = "جاري الاتصال...";
+            }
+        });
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.sidebar-menu li').forEach(b => b.classList.remove('active'));
+            const targetCard = document.getElementById(tabId);
+            if(targetCard) targetCard.classList.add('active');
+            document.querySelectorAll('.sidebar-menu li').forEach(li => {
+                if(li.getAttribute('data-tab') === tabId) li.classList.add('active');
+            });
+        }
+
+        document.querySelectorAll('.sidebar-menu li').forEach(li => {
+            li.addEventListener('click', function() {
+                const tab = this.getAttribute('data-tab');
+                if(tab) switchTab(tab);
+            });
+        });
+
+        document.getElementById('adminSecretTrigger').addEventListener('dblclick', () => switchTab('adminTab'));
+        document.getElementById('adminSecretTrigger').addEventListener('click', e => e.preventDefault());
+
+        function loadRegions() {
+            db.ref('regions').on('value', snap => {
+                let customRegions = snap.val();
+                let defaultRegions = ["تامزاوة", "تمسان", "براك المركز", "إدري", "القرضة", "المنصورة", "المحروقة", "تاروت", "قيرة", "برقن"];
+                if(customRegions) {
+                    Object.keys(customRegions).forEach(k => {
+                        if(!defaultRegions.includes(customRegions[k])) defaultRegions.push(customRegions[k]);
+                    });
+                }
+                const pickupSel = document.getElementById('pickupLocation');
+                const dropoffSel = document.getElementById('dropoffLocation');
+                const pricingPickup = document.getElementById('pricingPickup');
+                const pricingDropoff = document.getElementById('pricingDropoff');
+                
+                [pickupSel, dropoffSel, pricingPickup, pricingDropoff].forEach(sel => {
+                    if(sel) {
+                        sel.innerHTML = '';
+                        defaultRegions.forEach(reg => {
+                            sel.innerHTML += `<option value="${reg}">${reg}</option>`;
+                        });
+                    }
+                });
+            });
+        }
+        loadRegions();
+
+        // تحميل الملفات العامة المنشورة ليراها العامة في الشريط
+        db.ref('public_files').on('value', snap => {
+            const bar = document.getElementById('publicDownloadsBar');
+            const adminTable = document.getElementById('adminPublicFilesTable');
+            const data = snap.val();
+            if(!bar) return;
+            bar.innerHTML = '';
+            if(adminTable) adminTable.innerHTML = '';
+
+            if(!data) {
+                bar.innerHTML = '<span style="font-size: 0.85rem;">لا توجد ملفات مرفوعة حالياً. التطبيق المحلي وامن.</span>';
+                if(adminTable) adminTable.innerHTML = '<p style="font-size:0.85rem;">لا توجد ملفات مرفوعة.</p>';
+                return;
+            }
+
+            let adminHtml = '<table class="data-table"><tr><th>العنوان</th><th>الإجراء</th></tr>';
+            Object.keys(data).forEach(k => {
+                let file = data[k];
+                bar.innerHTML += `<a href="${file.fileUrl}" target="_blank" download="${file.title}" class="btn" style="padding: 6px 12px; font-size: 0.8rem; background: #047857; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;"><i class="fa-solid fa-download"></i> ${file.title}</a>`;
+                adminHtml += `<tr><td>${file.title}</td><td><button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="deletePublicFile('${k}')">حذف</button></td></tr>`;
+            });
+            if(adminTable) adminTable.innerHTML = adminHtml + '</table>';
+        });
+
+        document.getElementById('uploadPublicFileBtn').addEventListener('click', () => {
+            const title = document.getElementById('uploadFileTitle').value.trim();
+            const fileInput = document.getElementById('uploadFileInput');
+            if(!title || !fileInput.files || !fileInput.files[0]) {
+                alert('أدخل عنوان الملف واختبر الملف المراد رفعه.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let base64File = e.target.result;
+                db.ref('public_files').push({ title: title, fileUrl: base64File, time: new Date().toLocaleString('ar-LY') }).then(() => {
+                    alert('✅ تم رفع ونشر الملف بنجاح للعامة.');
+                    document.getElementById('uploadFileTitle').value = '';
+                    document.getElementById('uploadFileInput').value = '';
+                    logAdminAction(`رفع ملف عام: ${title}`);
+                });
+            };
+            reader.readAsDataURL(fileInput.files[0]);
+        });
+
+        window.deletePublicFile = (key) => {
+            if(confirm('هل أنت متأكد من حذف هذا الملف من العرض العام؟')) {
+                db.ref('public_files/' + key).remove().then(() => logAdminAction(`حذف ملف عام`));
             }
         };
 
-        // الذاكرة التخزينية للطلبات والطلبة والسجلات الدراسية
-        let dbStudents = JSON.parse(localStorage.getItem('mna_students')) || [
-            { name: 'محمد أحمد', stID: '2026101', dept: 'business', status: 'مقبول', feesPaid: true, grades: [{subject: 'مبادئ إدارة الأعمال', grade: 'امتياز'}] }
-        ];
+        document.getElementById('addNewRegionBtn').addEventListener('click', () => {
+            const regName = document.getElementById('newRegionInput').value.trim();
+            if(!regName) { alert('أدخل اسم المنطقة.'); return; }
+            db.ref('regions').push(regName).then(() => {
+                alert(`✅ تم إضافة منطقة (${regName}) بنجاح.`);
+                document.getElementById('newRegionInput').value = '';
+                logAdminAction(`إضافة منطقة جديدة: ${regName}`);
+            });
+        });
 
-        let currentActivePortal = '';
+        // تحديث الرقم السري للوحة الإدارة
+        document.getElementById('updateAdminPinBtn').addEventListener('click', () => {
+            const newPin = document.getElementById('newAdminPinPass').value.trim();
+            if(!newPin) { alert('أدخل كلمة المرور الجديدة.'); return; }
+            db.ref('admin_settings/custom_pin').set(newPin).then(() => {
+                alert('✅ تم تحديث الرقم السري للإدارة بنجاح.');
+                document.getElementById('newAdminPinPass').value = '';
+                logAdminAction('تحديث كلمة مرور لوحة الإدارة');
+            });
+        });
 
-        function saveData() { localStorage.setItem('mna_students', JSON.stringify(dbStudents)); }
+        document.getElementById('addNewAdminBtn').addEventListener('click', () => {
+            const user = document.getElementById('newAdminUser').value.trim();
+            const pass = document.getElementById('newAdminPass').value.trim();
+            if(!user || !pass) { alert('أدخل اسم المستخدم وكلمة المرور.'); return; }
 
-        function requestPortalAccess(portalType) {
-            currentActivePortal = portalType;
-            let titles = {
-                'student': 'تسجيل الدخول - بوابة الطلبة',
-                'employee': 'تسجيل الدخول - بوابة الموظفين',
-                'faculty': 'تسجيل الدخول - بوابة أعضاء هيئة التدريس',
-                'admin': 'تسجيل الدخول - بوابة الإدارة'
-            };
-            document.getElementById('loginTitleModal').innerText = titles[portalType];
-            document.getElementById('portalUser').value = '';
-            document.getElementById('portalPass').value = '';
+            db.ref('sub_admins/' + user).set({ pass }).then(() => {
+                alert(`✅ تم إنشاء حساب المشرف الفرعي (${user}) بنجاح.`);
+                document.getElementById('newAdminUser').value = '';
+                document.getElementById('newAdminPass').value = '';
+                logAdminAction(`إضافة مشرف إداري جديد: ${user}`);
+            });
+        });
 
-            document.getElementById('mainContainer').style.display = 'none';
-            hideAllPages();
-            document.getElementById('portalLoginWrapper').style.display = 'block';
-            window.scrollTo(0, 0);
-        }
+        window.deleteSubAdmin = (username) => {
+            if(confirm(`هل أنت متأكد من حذف المشرف (${username})؟`)) {
+                db.ref('sub_admins/' + username).remove().then(() => {
+                    alert('✅ تم حذف المشرف بنجاح.');
+                    logAdminAction(`حذف المشرف الإداري: ${username}`);
+                });
+            }
+        };
 
-        function verifyPortalLogin() {
-            let pass = document.getElementById('portalPass').value.trim();
-            let passwords = {
-                'student': 'student123',
-                'employee': 'emp123',
-                'faculty': 'fac123',
-                'admin': 'admin123'
-            };
+        db.ref('route_prices').on('value', snap => {
+            globalRoutesPricing = snap.val() || {};
+            checkLocationPricing();
+            loadAdminPricingTable();
+        });
 
-            if(pass === passwords[currentActivePortal]) {
-                hideAllPages();
-                let targetPage = currentActivePortal + 'Page';
-                document.getElementById(targetPage).style.display = 'block';
-                if(currentActivePortal === 'admin') loadAdminTable();
-                window.scrollTo(0, 0);
+        function checkLocationPricing() {
+            const pickup = document.getElementById('pickupLocation').value;
+            const dropoff = document.getElementById('dropoffLocation').value;
+            const finalField = document.getElementById('clientFinalCalculatedPrice');
+            const serviceType = document.getElementById('serviceType').value;
+
+            if (serviceType === 'طلب سيارة نقل') {
+                finalField.value = 'السعر بالاتفاق';
+                return;
+            }
+
+            let routeKey = `${pickup}_to_${dropoff}`;
+            if (globalRoutesPricing[routeKey]) {
+                finalField.value = globalRoutesPricing[routeKey].price + ' د.ل (محدد من الإدارة)';
+            } else if (pickup === dropoff) {
+                finalField.value = '10 د.ل (داخل المنطقة)';
             } else {
-                alert('كلمة المرور غير صحيحة!');
+                finalField.value = '10 د.ل (افتراضي)';
             }
         }
 
-        function hideAllPages() {
-            ['departmentPage', 'portalLoginWrapper', 'studentPage', 'employeePage', 'facultyPage', 'adminPage'].forEach(p => {
-                document.getElementById(p).style.display = 'none';
-            });
+        document.getElementById('serviceType').addEventListener('change', () => {
+            toggleCargoField();
+            checkLocationPricing();
+        });
+
+        function toggleCargoField() {
+            const service = document.getElementById('serviceType').value;
+            document.getElementById('cargoDetailsGroup').style.display = (service === 'طلب سيارة نقل') ? 'block' : 'none';
         }
 
-        function showMainHome() {
-            hideAllPages();
-            document.getElementById('mainContainer').style.display = 'block';
-            window.scrollTo(0, 0);
-        }
-
-        function scrollToSection(id) {
-            showMainHome();
-            setTimeout(() => document.getElementById(id).scrollIntoView({ behavior: 'smooth' }), 100);
-        }
-
-        function openDepartment(deptKey) {
-            let dept = departmentsData[deptKey];
-            if(!dept) return;
-            document.getElementById('deptTitle').innerText = dept.title;
-            document.getElementById('deptDesc').innerText = dept.desc;
-
-            let tbody = document.getElementById('coursesTableBody');
-            tbody.innerHTML = '';
-            dept.courses.forEach((c, idx) => {
-                tbody.innerHTML += `<tr><td>${idx+1}</td><td>${c.code}</td><td>${c.name}</td></tr>`;
-            });
-
-            document.getElementById('mainContainer').style.display = 'none';
-            hideAllPages();
-            document.getElementById('departmentPage').style.display = 'block';
-            window.scrollTo(0, 0);
-        }
-
-        // تسجيل الطالب (يذهب للإدارة للموافقة)
-        function submitStudentRegistration() {
-            let name = document.getElementById('stName').value.trim();
-            let stID = document.getElementById('stID').value.trim();
-            let dept = document.getElementById('stDept').value;
-
-            if(!name || !stID) { alert('الرجاء تعبئة الاسم ورقم القيد'); return; }
-            if(dbStudents.some(s => s.stID === stID)) { alert('رقم القيد مسجل مسبقاً'); return; }
-
-            dbStudents.push({ name, stID, dept, status: 'قيد الانتظار', feesPaid: true, grades: [] });
-            saveData();
-            alert('تم تقديم طلب التسجيل بنجاح. بانتظار موافقة الإدارة لتفعيل الدخول والسجل الدراسي.');
-            document.getElementById('stName').value = '';
-            document.getElementById('stID').value = '';
-        }
-
-        // الاستعلام عن السجل الدراسي التراكمي
-        function checkStudentRecord() {
-            let stID = document.getElementById('checkStID').value.trim();
-            let disp = document.getElementById('studentRecordDisplay');
-            if(!stID) { alert('أدخل رقم القيد'); return; }
-
-            let student = dbStudents.find(s => s.stID === stID);
-            if(!student) { disp.innerHTML = '<p style="color:red;">رقم القيد غير موجود.</p>'; return; }
-            if(student.status !== 'مقبول') { disp.innerHTML = `<p style="color:orange;">حالة التسجيل: ${student.status}. لا يمكن عرض السجل إلا بعد اعتماد الإدارة.</p>`; return; }
-
-            let deptInfo = departmentsData[student.dept];
-            let gradesHtml = student.grades.length > 0 ? student.grades.map(g => `<li><b>${g.subject}:</b> ${g.grade}</li>`).join('') : '<li>لم يتم رصد درجات بعد.</li>';
-
-            disp.innerHTML = `
-                <div style="background:#f8f9fa; padding:20px; border:1px solid #ddd; border-radius:6px;">
-                    <h3 style="color:#0b2545; margin-bottom:10px;">السجل الدراسي الأكاديمي</h3>
-                    <p><b>اسم الطالب:</b> ${student.name}</p>
-                    <p><b>رقم القيد:</b> ${student.stID}</p>
-                    <p><b>القسم:</b> ${deptInfo ? deptInfo.title : student.dept}</p>
-                    <p><b>حالة القيد:</b> <span style="color:green; font-weight:bold;">${student.status}</span></p>
-                    <h4 style="margin-top:15px; color:#0b2545;">الدرجات والمقررات المرصودة:</h4>
-                    <ul style="margin-right:20px; margin-top:5px;">${gradesHtml}</ul>
-                </div>
-            `;
-        }
-
-        // تسجيل الموظف
-        function employeeRegisterStudent() {
-            let name = document.getElementById('empStName').value.trim();
-            let stID = document.getElementById('empStID').value.trim();
-            let dept = document.getElementById('empStDept').value;
-            if(!name || !stID) { alert('املأ الحقول المطلوبة'); return; }
-
-            dbStudents.push({ name, stID, dept, status: 'مقبول', feesPaid: true, grades: [] });
-            saveData();
-            alert('تم تسجيل الطالب وتفعيله بالمنظومة بنجاح.');
-        }
-
-        // رصد الدرجات (أعضاء هيئة التدريس)
-        function saveStudentGrade() {
-            let stID = document.getElementById('facStID').value.trim();
-            let subject = document.getElementById('facSubject').value.trim();
-            let grade = document.getElementById('facGrade').value.trim();
-
-            let student = dbStudents.find(s => s.stID === stID);
-            if(!student) { alert('الطالب غير موجود'); return; }
-
-            student.grades.push({ subject, grade });
-            saveData();
-            alert('تم رصد الدرجة وإضافتها للسجل الدراسي للطالب.');
-        }
-
-        // لوحة تحكم الأدمن
-        function loadAdminTable() {
-            let tbody = document.getElementById('requestsTableBody');
-            tbody.innerHTML = '';
-            dbStudents.forEach((st, idx) => {
-                let badge = st.status === 'مقبول' ? 'badge-approved' : (st.status === 'مرفوض' ? 'badge-rejected' : 'badge-pending');
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${idx+1}</td>
-                        <td>${st.name}</td>
-                        <td>${st.stID}</td>
-                        <td>${st.dept}</td>
-                        <td class="${badge}">${st.status}</td>
-                        <td>
-                            <button onclick="updateStatus('${st.stID}', 'مقبول')" style="background:#16a34a; color:#fff; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">قبول</button>
-                            <button onclick="updateStatus('${st.stID}', 'مرفوض')" style="background:#dc2626; color:#fff; border:none; padding:5px 10px; border-radius:3px; cursor:pointer;">رفض</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function updateStatus(stID, status) {
-            let student = dbStudents.find(s => s.stID === stID);
-            if(student) {
-                student.status = status;
-                saveData();
-                loadAdminTable();
+        function toggleAuthMode(portal, mode) {
+            const container = portal === 'client' ? document.getElementById('clientPortalTab') : document.getElementById('driverPortalTab');
+            const loginBox = container.querySelector(portal === 'client' ? '#clientLoginBox' : '#driverLoginBox');
+            const regBox = container.querySelector(portal === 'client' ? '#clientRegisterBox' : '#driverRegisterBox');
+            
+            const btns = container.querySelectorAll('.sub-btn');
+            btns.forEach(b => b.classList.remove('active'));
+            if(mode === 'login') {
+                loginBox.classList.add('active'); regBox.classList.remove('active'); btns[0].classList.add('active');
+            } else if(mode === 'register') {
+                regBox.classList.add('active'); loginBox.classList.remove('active'); btns[1].classList.add('active');
             }
+        }
+
+        document.getElementById('clientLoginSwitchBtn').addEventListener('click', () => toggleAuthMode('client', 'login'));
+        document.getElementById('clientRegSwitchBtn').addEventListener('click', () => toggleAuthMode('client', 'register'));
+        document.getElementById('driverLoginSwitchBtn').addEventListener('click', () => toggleAuthMode('driver', 'login'));
+        document.getElementById('driverRegSwitchBtn').addEventListener('click', () => toggleAuthMode('driver', 'register'));
+
+        document.getElementById('submitRechargeBtn').addEventListener('click', () => {
+            const code = document.getElementById('rechargeCardCode').value.trim();
+            if(!code) { alert('أدخل كود الكرت.'); return; }
+            if(!currentClientPhone) { alert('يجب تسجيل الدخول أولاً.'); return; }
+
+            db.ref('cards/' + code).once('value').then(snap => {
+                if(!snap.val()) { alert('كود الكرت غير صحيح.'); return; }
+                let cardData = snap.val();
+                if(cardData.used) { alert('⚠ هذا الكرت مستخدم مسبقاً.'); return; }
+
+                let now = Date.now();
+                let thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+                if(cardData.createdAt && (now - cardData.createdAt > thirtyDaysMs)) {
+                    alert('❌ عذراً، انتهت صلاحية هذا الكرت.');
+                    return;
+                }
+
+                db.ref('clients/' + currentClientPhone).once('value').then(clientSnap => {
+                    if(!clientSnap.val()) { alert('حساب الزبون غير موجود.'); return; }
+                    let clientData = clientSnap.val();
+                    let newWallet = (clientData.wallet || 0) + cardData.value;
+                    let systemProfit = (cardData.value / 20) * 2;
+
+                    db.ref('clients/' + currentClientPhone).update({ wallet: newWallet });
+                    db.ref('cards/' + code).update({ used: true, usedBy: currentClientPhone });
+                    addRevenue(systemProfit, `شحن كرت زبون بقيمة ${cardData.value} د.ل`);
+
+                    alert(`🎉 تم شحن رصيدك بنجاح بقيمة ${cardData.value} د.ل! يمكنك الآن طلب الرحلات بشكل طبيعي.`);
+                    document.getElementById('rechargeCardCode').value = '';
+                    document.getElementById('clientWalletDisplay').innerText = newWallet;
+                });
+            });
+        });
+
+        document.getElementById('driverSubmitRechargeBtn').addEventListener('click', () => {
+            const code = document.getElementById('driverRechargeCardCode').value.trim();
+            if(!code) { alert('أدخل كود الكرت.'); return; }
+            if(!currentDriverPhone) { alert('يجب تسجيل دخول الكابتن أولاً.'); return; }
+
+            db.ref('cards/' + code).once('value').then(snap => {
+                if(!snap.val()) { alert('كود الكرت غير صحيح.'); return; }
+                let cardData = snap.val();
+                if(cardData.used) { alert('⚠ هذا الكرت مستخدم مسبقاً.'); return; }
+
+                let now = Date.now();
+                let thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
+                if(cardData.createdAt && (now - cardData.createdAt > thirtyDaysMs)) {
+                    alert('❌ عذراً، انتهت صلاحية هذا الكرت.');
+                    return;
+                }
+
+                db.ref('drivers/' + currentDriverPhone).once('value').then(driverSnap => {
+                    if(!driverSnap.val()) { alert('حساب السائق غير موجود.'); return; }
+                    let driverData = driverSnap.val();
+                    
+                    let netAddedValue = cardData.value - 1;
+                    let newWallet = (driverData.wallet || 0) + netAddedValue;
+                    let statement = driverData.statement || [];
+                    let timeStr = new Date().toLocaleString('ar-LY');
+
+                    statement.push({ time: timeStr, text: `شحن كرت بقيمة ${cardData.value} د.ل (خصم 1 د.ل رسوم، الصافي ${netAddedValue} د.ل)` });
+
+                    db.ref('drivers/' + currentDriverPhone).update({ wallet: newWallet, statement: statement });
+                    db.ref('cards/' + code).update({ used: true, usedBy: currentDriverPhone });
+                    
+                    let systemProfit = 1 + ((cardData.value / 20) * 2);
+                    addRevenue(systemProfit, `شحن كرت لسائق ${currentDriverPhone} بقيمة ${cardData.value} د.ل (مع خصم 1 د.ل رسوم)`);
+
+                    alert(`🎉 تم تفعيل الكرت بنجاح! تم إضافة صافي الرصيد (${netAddedValue} د.ل) بعد خصم 1 دينار رسوم.`);
+                    document.getElementById('driverRechargeCardCode').value = '';
+                    document.getElementById('driverWalletBalance').innerText = newWallet;
+                });
+            });
+        });
+
+        document.getElementById('submitTransferBtn').addEventListener('click', () => {
+            if(!currentClientPhone) { alert('يجب تسجيل دخول الزبون أولاً.'); return; }
+            const driverPhone = document.getElementById('transferDriverPhone').value.trim();
+            const amount = parseFloat(document.getElementById('transferAmount').value);
+
+            if(!driverPhone || isNaN(amount) || amount <= 0) {
+                alert('أدخل رقم هاتف سائق صحيح والمبلغ المراد تحويله.');
+                return;
+            }
+
+            db.ref('clients/' + currentClientPhone).once('value').then(cSnap => {
+                if(!cSnap.val()) { alert('حساب الزبون غير موجود.'); return; }
+                let clientData = cSnap.val();
+                let clientWallet = clientData.wallet || 0;
+
+                if(clientWallet < amount) {
+                    alert(`❌ عذراً، رصيد محفظتك الحالي (${clientWallet} د.ل) لا يكفي لإتمام عملية التحويل.`);
+                    return;
+                }
+
+                db.ref('drivers/' + driverPhone).once('value').then(dSnap => {
+                    if(!dSnap.val()) {
+                        alert('❌ رقم هاتف السائق غير مسجل أو غير موجود في النظام.');
+                        return;
+                    }
+                    let driverData = dSnap.val();
+                    let driverWallet = driverData.wallet || 0;
+                    let statement = driverData.statement || [];
+                    let timeStr = new Date().toLocaleString('ar-LY');
+
+                    let newClientWallet = clientWallet - amount;
+                    let newDriverWallet = driverWallet + amount;
+
+                    statement.push({ time: timeStr, text: `استلام تحويل مبلغ ${amount} د.ل من الزبون (${currentClientPhone})` });
+
+                    db.ref('clients/' + currentClientPhone).update({ wallet: newClientWallet });
+                    db.ref('drivers/' + driverPhone).update({ wallet: newDriverWallet, statement: statement });
+
+                    logAdminAction(`تحويل رصيد من الزبون ${currentClientPhone} إلى السائق ${driverPhone} بقيمة ${amount} د.ل`);
+
+                    alert(`✅ تم تحويل مبلغ ${amount} د.ل بنجاح إلى محفظة الكابتن ${driverData.fullName}!`);
+                    document.getElementById('transferDriverPhone').value = '';
+                    document.getElementById('transferAmount').value = '';
+                    document.getElementById('clientWalletDisplay').innerText = newClientWallet;
+                });
+            });
+        });
+
+        document.getElementById('clientRegBtn').addEventListener('click', () => {
+            const name = document.getElementById('clientRegName').value.trim();
+            const phone = document.getElementById('clientRegPhone').value.trim();
+            const pin = document.getElementById('clientRegPin').value.trim();
+            const idNumber = document.getElementById('clientRegIdNumber').value.trim();
+            const idPlace = document.getElementById('clientRegIdPlace').value.trim();
+            const idDate = document.getElementById('clientRegIdDate').value;
+            const legalChecked = document.getElementById('clientLegalCheck').checked;
+
+            if(!name || !phone || !pin || !idNumber || !idPlace || !idDate) { alert('أدخل كافة البيانات المطلوبة.'); return; }
+            if(!legalChecked) { alert('يجب الموافقة على التعهد القانوني للمتابعة.'); return; }
+
+            db.ref('pending_registrations/clients/' + phone).set({
+                name, pin, idNumber, idPlace, idDate, type: 'زبون', wallet: 0, completedTrips: 0, timestamp: Date.now()
+            }).then(() => {
+                alert('✅ تم إرسال طلب تسجيل الزبون بنجاح وهو بانتظار موافقة الإدارة.');
+                toggleAuthMode('client', 'login');
+            });
+        });
+
+        document.getElementById('clientLoginBtn').addEventListener('click', () => {
+            const phone = document.getElementById('clientLoginPhone').value.trim();
+            const pin = document.getElementById('clientLoginPin').value.trim();
+            db.ref('clients/' + phone).once('value').then(snap => {
+                if(!snap.val() || snap.val().pin !== pin) { alert('خطأ في البيانات أو أن الحساب غير معتمد من الإدارة بعد.'); return; }
+                
+                let clientData = snap.val();
+                let activeDevice = clientData.activeDevice || '';
+                
+                if(activeDevice && activeDevice !== browserInstanceId) {
+                    alert('❌ عذراً، هذا الحساب مسجل ومفتوح حالياً على جهاز أو متصفح آخر. التطبيق المحلي وامن ويمنع فتح الحساب من عدة متصفحات.');
+                    return;
+                }
+
+                db.ref('clients/' + phone + '/activeDevice').set(browserInstanceId);
+                currentClientPhone = phone;
+                loadClientDashboard(clientData);
+            });
+        });
+
+        function loadClientDashboard(data) {
+            document.getElementById('clientLoginBox').style.display = 'none';
+            document.getElementById('clientRegisterBox').style.display = 'none';
+            document.getElementById('clientAuthSwitchBtns').style.display = 'none';
+            document.getElementById('clientDashboardArea').style.display = 'block';
+            document.getElementById('clientOrdersWrapper').style.display = 'block';
+            document.getElementById('clientWelcomeName').innerText = data.name;
+            document.getElementById('clientWalletDisplay').innerText = data.wallet || 0;
+            document.getElementById('clientTripsCount').innerText = data.completedTrips || 0;
+            loadClientActiveOrders();
+        }
+
+        document.getElementById('clientLogoutBtn2').addEventListener('click', () => {
+            if(currentClientPhone) {
+                db.ref('clients/' + currentClientPhone + '/activeDevice').remove();
+            }
+            currentClientPhone = null;
+            document.getElementById('clientDashboardArea').style.display = 'none';
+            document.getElementById('clientOrdersWrapper').style.display = 'none';
+            document.getElementById('clientAuthSwitchBtns').style.display = 'flex';
+            toggleAuthMode('client', 'login');
+        });
+
+        document.getElementById('sendOrderBtn').addEventListener('click', () => {
+            if(!currentClientPhone) return;
+
+            db.ref('clients/' + currentClientPhone).once('value').then(cSnap => {
+                let clientData = cSnap.val();
+                let clientWallet = clientData.wallet || 0;
+
+                if(clientWallet <= -3) {
+                    alert(`❌ عذراً، رصيد محفظتك الحالي هو (${clientWallet} د.ل). لقد وصلت للحد الأدنى المسموح (-3 د.ل)، ولا يمكنك طلب رحلة جديدة إلا بعد شحن محفظتك بكرت مسبق الدفع.`);
+                    return;
+                }
+
+                const service = document.getElementById('serviceType').value;
+                const genderType = document.getElementById('clientGenderType').value;
+                const pickup = document.getElementById('pickupLocation').value;
+                const dropoff = document.getElementById('dropoffLocation').value;
+                const paymentMethod = document.getElementById('paymentMethod').value;
+                const cargoDetails = document.getElementById('cargoDetailsInput').value.trim();
+                
+                let routeKey = `${pickup}_to_${dropoff}`;
+                let price = (service === 'طلب سيارة نقل') ? 'بالاتفاق' : (globalRoutesPricing[routeKey] ? globalRoutesPricing[routeKey].price + ' د.ل' : '10 د.ل');
+
+                db.ref('orders').push({
+                    clientName: clientData.name,
+                    clientPhone: currentClientPhone,
+                    serviceType: service,
+                    genderType: genderType,
+                    pickupLocation: pickup,
+                    dropoffLocation: dropoff,
+                    price: price,
+                    paymentMethod: paymentMethod,
+                    cargoDetails: cargoDetails || 'لا توجد',
+                    status: 'قيد الانتظار',
+                    driverName: 'بانتظار القبول',
+                    timestamp: Date.now()
+                }).then(() => {
+                    addRevenue(1, `عمولة طلب رحلة من الزبون ${currentClientPhone}`);
+                    alert('🎉 تم إرسال طلبك بنجاح ووصل تلقائياً للسائقين المتاحين!');
+                });
+            });
+        });
+
+        function loadClientActiveOrders() {
+            db.ref('orders').orderByChild('clientPhone').equalTo(currentClientPhone).on('value', snap => {
+                const listDiv = document.getElementById('clientActiveOrdersList');
+                const data = snap.val();
+                listDiv.innerHTML = '';
+                if(!data) { listDiv.innerHTML = '<p>لا توجد طلبات نشطة.</p>'; return; }
+                Object.keys(data).forEach(k => {
+                    let ord = data[k];
+                    let orderHtml = `<div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:8px;">` +
+                                    `<p><b>${ord.serviceType}</b> (${ord.genderType}) | ${ord.pickupLocation} ➔${ord.dropoffLocation}</p>` +
+                                    `<p>السعر: <b>${ord.price}</b> | الحالة: <b style="color:var(--primary);">${ord.status}</b></p>`;
+                    
+                    if(ord.status === 'مقبولة وتوصيل' && ord.driverPhone) {
+                        db.ref('drivers/' + ord.driverPhone + '/location').once('value').then(locSnap => {
+                            let locUrl = locSnap.val();
+                            if(locUrl) {
+                                orderHtml += `<a href="${locUrl}" target="_blank" class="btn btn-success" style="display:block; text-align:center; margin-top:6px; padding:5px; font-size:0.8rem; text-decoration:none;"><i class="fa-solid fa-map-location-dot"></i> تتبع موقع السائق الحي</a>`;
+                            }
+                        });
+                        orderHtml += `<button class="btn btn-success" style="margin-top:8px; padding:8px; font-size:0.85rem; background:#16a34a;" onclick="clientCompleteOrder('${k}', '${ord.driverPhone}')"><i class="fa-solid fa-circle-check"></i> تم التوصيل بنجاح</button>`;
+                    } else if(ord.status === 'مكتملة') {
+                        orderHtml += `<p style="color:green; font-weight:bold; margin-top:5px;"><i class="fa-solid fa-check-double"></i> تم إتمام التوصيل بنجاح</p>`;
+                    }
+                    orderHtml += `</div>`;
+                    listDiv.innerHTML += orderHtml;
+                });
+            });
+        }
+
+        window.clientCompleteOrder = (orderId, driverPhone) => {
+            if(!currentClientPhone) return;
+            if(!confirm('هل تؤكد وصول الطلب وإتمام التوصيل بنجاح؟')) return;
+
+            db.ref('orders/' + orderId).once('value').then(oSnap => {
+                let ord = oSnap.val();
+                if(ord.status === 'مكتملة') return;
+
+                db.ref('orders/' + orderId).update({ status: 'مكتملة' }).then(() => {
+                    let timeStr = new Date().toLocaleString('ar-LY');
+
+                    db.ref('clients/' + currentClientPhone).once('value').then(cSnap => {
+                        let cData = cSnap.val();
+                        let cWallet = (cData.wallet || 0) - 1;
+                        let cTrips = (cData.completedTrips || 0) + 1;
+                        db.ref('clients/' + currentClientPhone).update({ wallet: cWallet, completedTrips: cTrips });
+                        document.getElementById('clientWalletDisplay').innerText = cWallet;
+                        document.getElementById('clientTripsCount').innerText = cTrips;
+                        addRevenue(1, `خصم خدمات 1 د.ل عند تأكيد الزبون ${currentClientPhone} إتمام الرحلة`);
+                    });
+
+                    if(driverPhone) {
+                        db.ref('drivers/' + driverPhone).once('value').then(dSnap => {
+                            let dData = dSnap.val();
+                            if(!dData) return;
+                            let dWallet = (dData.wallet || 0) - 1;
+                            let dTrips = (dData.completedTrips || 0) + 1;
+                            let statement = dData.statement || [];
+                            let starBadge = dData.starBadge || false;
+
+                            statement.push({ time: timeStr, text: `إتمام الرحلة بنجاح وتأكيد الزبون (خصم 1 د.ل رسوم نظام)` });
+
+                            let bonusMsg = '';
+                            if(dTrips >= 30 && !starBadge) {
+                                starBadge = true;
+                                dWallet += 10;
+                                statement.push({ time: timeStr, text: `🎉 مبروك! إنجاز 30 رحلة بنجاح والحصول على نجمة (⭐) ورصيد مجاني تحفيزي.` });
+                                bonusMsg = ' وتهانينا! لقد حققت 30 رحلة وتم منحك نجمة تقديرية ورصيد مجاني في محفظتك!';
+                            }
+
+                            db.ref('drivers/' + driverPhone).update({
+                                wallet: dWallet,
+                                completedTrips: dTrips,
+                                statement: statement,
+                                starBadge: starBadge
+                            });
+
+                            addRevenue(1, `خصم عمولة 1 د.ل من السائق ${driverPhone} عند إتمام التوصيل`);
+
+                            if(currentDriverPhone === driverPhone) {
+                                document.getElementById('driverWalletBalance').innerText = dWallet;
+                                document.getElementById('driverTripsCount').innerText = dTrips;
+                                if(starBadge) {
+                                    document.getElementById('driverBadgeBox').innerHTML = '⭐ (الكابتن الحائز على النجمة لإنجازه 30 رحلة)';
+                                }
+                            }
+                            alert('✅ تم تأكيد إتمام التوصيل بنجاح! تم خصم 1 دينار من محفظتك وتحديث الأرصدة وإيرادات النظام.' + bonusMsg);
+                        });
+                    }
+                });
+            });
+        };
+
+        function readFileAsBase64(fileInputId, callback) {
+            const fileInput = document.getElementById(fileInputId);
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) { callback(e.target.result); };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                callback(null);
+            }
+        }
+
+        window.openImageModal = (dataUrl, title) => {
+            if(!dataUrl) { alert('المستند غير متوفر.'); return; }
+            const win = window.open('', '_blank');
+            win.document.write(`
+                <html dir="rtl">
+                <head><title>معاينة مستند - ${title}</title></head>
+                <body style="background:#111; color:#fff; text-align:center; padding:20px; font-family:Cairo,sans-serif;">
+                    <h2>${title}</h2>
+                    <hr style="border-color:#444; margin:15px 0;">
+                    <img src="${dataUrl}" style="max-width:100%; height:auto; border-radius:8px; box-shadow:0 0 15px rgba(255,255,255,0.2);">
+                    <br><br>
+                    <button onclick="window.close()" style="padding:10px 20px; background:#dc3545; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">إغلاق المعاينة</button>
+                </body>
+                </html>
+            `);
+        };
+
+        document.getElementById('driverRegBtn').addEventListener('click', () => {
+            const name = document.getElementById('driverRegName').value.trim();
+            const phone = document.getElementById('driverRegPhone').value.trim();
+            const car = document.getElementById('driverRegCar').value.trim();
+            const carPlate = document.getElementById('driverRegCarPlate').value.trim();
+            const gender = document.getElementById('driverRegGender').value;
+            const idNumber = document.getElementById('driverRegIdNumber').value.trim();
+            const idPlace = document.getElementById('driverRegIdPlace').value.trim();
+            const idDate = document.getElementById('driverRegIdDate').value;
+            const legalChecked = document.getElementById('driverLegalCheck').checked;
+
+            const carFile = document.getElementById('driverFileCar').files[0];
+            const passFile = document.getElementById('driverFilePassport').files[0];
+            const bookFile = document.getElementById('driverFileBook').files[0];
+
+            if(!name || !phone || !car || !carPlate || !idNumber || !idPlace || !idDate) {
+                alert('أرجو إدخال كافة البيانات الشخصية وبيانات المركبة المطلوبة.');
+                return;
+            }
+            if(!carFile || !passFile || !bookFile) {
+                alert('⚠️ عذراً، يجب رفع جميع المستندات المطلوبة (صورة السيارة، الهوية أو جواز السفر، وكتيب المركبة) لإتمام التسجيل وإرساله للإدارة.');
+                return;
+            }
+            if(!legalChecked) {
+                alert('يجب الموافقة على التعهد القانوني للمتابعة.');
+                return;
+            }
+
+            readFileAsBase64('driverFileCar', (carImg) => {
+                readFileAsBase64('driverFilePassport', (passImg) => {
+                    readFileAsBase64('driverFileBook', (bookImg) => {
+                        db.ref('pending_registrations/drivers/' + phone).set({
+                            fullName: name, whatsapp: phone, carType: car, carPlate: carPlate, gender: gender,
+                            idNumber, idPlace, idDate, carImg: carImg || '', passImg: passImg || '', bookImg: bookImg || '',
+                            type: 'سائق', wallet: 0, completedTrips: 0, statement: [], timestamp: Date.now()
+                        }).then(() => {
+                            alert('✅ تم رفع المستندات وحفظ نسخة منها للإدارة، وتم إرسال طلب انضمام الكابتن بنجاح وهو بانتظار الاعتماد.');
+                            toggleAuthMode('driver', 'login');
+                        }).catch(err => {
+                            alert('❌ حدث خطأ أثناء إرسال الطلب: ' + err.message);
+                        });
+                    });
+                });
+            });
+        });
+
+        document.getElementById('driverLoginBtn').addEventListener('click', () => {
+            const phone = document.getElementById('driverLoginPhone').value.trim();
+            db.ref('drivers/' + phone).once('value').then(snap => {
+                if(!snap.val()) { alert('رقم السائق غير مسجل أو لم يتم اعتماده من الإدارة بعد.'); return; }
+                
+                let driverData = snap.val();
+                let activeDevice = driverData.activeDevice || '';
+                
+                if(activeDevice && activeDevice !== browserInstanceId) {
+                    alert('❌ عذراً، حساب الكابتن مسجل ومفتوح حالياً على جهاز أو متصفح آخر. التطبيق المحلي وامن ويمنع فتح الحساب من عدة متصفحات.');
+                    return;
+                }
+
+                db.ref('drivers/' + phone + '/activeDevice').set(browserInstanceId);
+                currentDriverPhone = phone;
+                currentDriverGender = driverData.gender || 'ذكر';
+                loadDriverDashboard(driverData);
+            });
+        });
+
+        function loadDriverDashboard(data) {
+            let driverWallet = data.wallet || 0;
+            let tripsCount = data.completedTrips || 0;
+            let starBadge = data.starBadge || false;
+
+            if(driverWallet <= 10) {
+                alert('⚠️ عزيزي السائق، رصيدك منخفض. اطلب كرت شحن عبر مراسلة رقم الإدارة على واتساب: 0913368086');
+            }
+
+            document.getElementById('driverLoginBox').style.display = 'none';
+            document.getElementById('driverRegisterBox').style.display = 'none';
+            document.getElementById('driverAuthSwitchBtns').style.display = 'none';
+            document.getElementById('driverDashboardArea').style.display = 'block';
+            document.getElementById('driverWelcomeName').innerText = data.fullName;
+            document.getElementById('driverGenderDisplay').innerText = currentDriverGender;
+            document.getElementById('driverWalletBalance').innerText = driverWallet;
+            document.getElementById('driverTripsCount').innerText = tripsCount;
+            document.getElementById('driverBadgeBox').innerHTML = starBadge ? '⭐ (الكابتن الحائز على النجمة لإنجازه 30 رحلة)' : '';
+
+            const stmtDiv = document.getElementById('driverPersonalStatement');
+            if(data.statement && data.statement.length > 0) {
+                let stmtHtml = '<ul style="padding-right: 15px;">';
+                data.statement.slice(-5).reverse().forEach(st => {
+                    stmtHtml += `<li>${st.time}:${st.text}</li>`;
+                });
+                stmtHtml += '</ul>';
+                stmtDiv.innerHTML = stmtHtml;
+            } else {
+                stmtDiv.innerHTML = 'لا توجد معاملات مالية مسجلة بعد.';
+            }
+            
+            db.ref('orders').on('value', snap => {
+                const listDiv = document.getElementById('driversOrdersList');
+                const historyDiv = document.getElementById('driverTripHistoryList');
+                const orders = snap.val();
+                listDiv.innerHTML = ''; historyDiv.innerHTML = '';
+                if(!orders) { listDiv.innerHTML = '<p>لا توجد طلبات متاحة.</p>'; return; }
+
+                let currentOrderCount = Object.keys(orders).length;
+                if(currentOrderCount > lastKnownOrderCount && lastKnownOrderCount !== 0) {
+                    playBeepSoundAndNotify("رحلة جديدة متوفرة في النظام!");
+                }
+                lastKnownOrderCount = currentOrderCount;
+
+                Object.keys(orders).forEach(k => {
+                    let ord = orders[k];
+                    
+                    let isTransportService = (ord.serviceType === 'طلب سيارة نقل');
+                    let isTaxiOrDelivery = (ord.serviceType === 'توصيل ركاب (تكسي)' || ord.serviceType === 'توصيل طلبات');
+                    let isFemaleOrder = (ord.genderType === 'انثى');
+                    let isDriverFemale = (currentDriverGender === 'انثى');
+
+                    let canSeeOrder = false;
+                    if (ord.status === 'قيد الانتظار') {
+                        if (isTransportService) {
+                            canSeeOrder = true;
+                        } else if (isTaxiOrDelivery && isFemaleOrder && isDriverFemale) {
+                            canSeeOrder = true;
+                        } else if (isTaxiOrDelivery && !isFemaleOrder && !isDriverFemale) {
+                            canSeeOrder = true;
+                        }
+                    }
+
+                    if(canSeeOrder && driverWallet > 10) {
+                        listDiv.innerHTML += `<div class="driver-order-item"><p><b>${ord.serviceType}</b> (${ord.genderType}) | من ${ord.pickupLocation} إلى ${ord.dropoffLocation}</p>` +
+                                             `<p>السعر المحدد: <b style="color:var(--primary); font-size: 1rem;">${ord.price}</b> \vert{} الدفع: <b>${ord.paymentMethod}</b></p>` +
+                                             `<button class="btn btn-success" style="margin-top:6px; padding:6px;" onclick="acceptOrder('${k}')">قبول الطلب</button></div>`;
+                    }
+
+                    if(ord.driverPhone === currentDriverPhone) {
+                        let isDone = ord.status === 'مكتملة';
+                        historyDiv.innerHTML += `<div class="driver-order-item"><p><b>${ord.serviceType}</b> | السعر: <b style="color:var(--primary);">${ord.price}</b></p>` +
+                                                 `<p>الزبون: <b>${ord.clientName}</b> | هاتف: <a href="tel:${ord.clientPhone}" style="color:var(--primary); font-weight:bold;">${ord.clientPhone} <i class="fa-solid fa-phone"></i></a></p>` +
+                                                 `<p>الدفع: <b>${ord.paymentMethod}</b> | الحالة: <span style="color:${isDone?'green':'orange'}; font-weight:bold;">${ord.status}</span></p>` +
+                                                 (!isDone ? `<p style="font-size: 0.8rem; color: #d97706; margin-top:5px;"><i class="fa-solid fa-info-circle"></i> في انتظار قيام الزبون بالضغط على زر "تم التوصيل بنجاح" لإتمام الرحلة رسمياً.</p>` : ``) +
+                                                 `</div>`;
+                    }
+                });
+            });
+        }
+
+        document.getElementById('shareLocationBtn').addEventListener('click', () => {
+            if (!navigator.geolocation) { alert("متصفحك لا يدعم تحديد الموقع."); return; }
+            navigator.geolocation.watchPosition((pos) => {
+                const lat = pos.coords.latitude;
+                const lon = pos.coords.longitude;
+                const mapUrl = `https://maps.google.com/?q=${lat},${lon}`;
+                if(currentDriverPhone) {
+                    db.ref('drivers/' + currentDriverPhone + '/location').set(mapUrl);
+                }
+            }, (err) => console.log(err), { enableHighAccuracy: true });
+            alert("📍 تم تفعيل ومشاركة موقعك الحي مع الزبون.");
+        });
+
+        window.acceptOrder = (id) => {
+            db.ref('drivers/' + currentDriverPhone).once('value').then(snap => {
+                if((snap.val().wallet || 0) <= 10) {
+                    alert('❌ عذراً، رصيدك 10 دينار أو أقل. اطلب كرت شحن بمراسلة واتساب: 0913368086');
+                    return;
+                }
+                db.ref('orders/' + id).update({ status: 'مقبولة وتوصيل', driverPhone: currentDriverPhone }).then(() => {
+                    addRevenue(1, `عمولة قبول رحلة من السائق ${currentDriverPhone}`);
+                    alert('✅ تم قبول الطلب بنجاح وتم تسجيل العمولة للنظام.');
+                });
+            });
+        };
+
+        // تسجيل دخول الإدارة مع دعم التغيير المخصص للرقم السري
+        document.getElementById('adminLoginBtn').addEventListener('click', () => {
+            const user = document.getElementById('adminUsernameInput').value.trim();
+            const pass = document.getElementById('adminPinInput').value.trim();
+
+            db.ref('admin_settings/custom_pin').once('value').then(pinSnap => {
+                let actualAdminPin = pinSnap.val() || '1234';
+
+                if(user === 'admin' && pass === actualAdminPin) {
+                    openAdminPanel();
+                } else {
+                    db.ref('sub_admins/' + user).once('value').then(snap => {
+                        if(snap.val() && snap.val().pass === pass) {
+                            openAdminPanel();
+                        } else {
+                            alert('بيانات الدخول غير صحيحة.');
+                        }
+                    });
+                }
+            });
+        });
+
+        function openAdminPanel() {
+            document.getElementById('adminLoginBox').style.display = 'none';
+            document.getElementById('adminContentPanel').style.display = 'block';
+            loadAdminPanelData();
+        }
+
+        document.getElementById('saveRoutePriceBtn').addEventListener('click', () => {
+            const pickup = document.getElementById('pricingPickup').value;
+            const dropoff = document.getElementById('pricingDropoff').value;
+            const amount = parseFloat(document.getElementById('pricingAmount').value);
+
+            if(isNaN(amount) || amount <= 0) { alert('أدخل سعراً صحيحاً.'); return; }
+
+            let routeKey = `${pickup}_to_${dropoff}`;
+            db.ref('route_prices/' + routeKey).set({ pickup, dropoff, price: amount }).then(() => {
+                alert(`✅ تم حفظ السعر للمسار (${pickup} ➔ ${dropoff}) بنجاح!`);
+                document.getElementById('pricingAmount').value = '';
+                logAdminAction(`تحديد سعر المسار ${pickup} إلى ${dropoff} بقيمة ${amount} د.ل`);
+            });
+        });
+
+        function loadAdminPricingTable() {
+            const div = document.getElementById('adminSavedPricingTable');
+            if(!div) return;
+            div.innerHTML = '';
+            if(Object.keys(globalRoutesPricing).length === 0) {
+                div.innerHTML = '<p style="font-size:0.8rem;">لا توجد مسارات مسعرة بعد.</p>';
+                return;
+            }
+
+            let html = '<table class="data-table"><tr><th>من</th><th>إلى</th><th>السعر</th><th>إجراء</th></tr>';
+            Object.keys(globalRoutesPricing).forEach(key => {
+                let r = globalRoutesPricing[key];
+                html += `<tr><td>${r.pickup}</td><td>${r.dropoff}</td><td><b>${r.price} د.ل</b></td>` +
+                        `<td><button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="deleteRoutePrice('${key}')">حذف</button></td></tr>`;
+            });
+            div.innerHTML = html + '</table>';
+        }
+
+        window.deleteRoutePrice = (key) => {
+            if(confirm('هل أنت متأكد من الحذف؟')) {
+                db.ref('route_prices/' + key).remove().then(() => logAdminAction(`حذف تسعير المسار ${key}`));
+            }
+        };
+
+        document.getElementById('factoryResetBtn').addEventListener('click', () => {
+            if(confirm('⚠️ تحذير خطير: هل أنت متأكد تماماً من رغبتك في تصفير التطبيق بالكامل؟')) {
+                if(confirm('تأكيد نهائي: سيتم مسح كافة البيانات والسجلات، هل أنت متأكد؟')) {
+                    db.ref().remove().then(() => {
+                        alert('✅ تم تصفير وإعادة ضبط المنظومة.');
+                        location.reload();
+                    });
+                }
+            }
+        });
+
+        document.getElementById('generateBatchCardsBtn').addEventListener('click', () => {
+            const prefix = document.getElementById('batchPrefix').value.trim() || 'WAS';
+            const count = parseInt(document.getElementById('batchCount').value) || 10;
+            const val = parseFloat(document.getElementById('batchValue').value) || 20;
+            let createdAt = Date.now();
+
+            for(let i = 1; i <= count; i++) {
+                let code = `${prefix}-${Math.floor(1000 + Math.random() * 9000)}`;
+                db.ref('cards/' + code).set({ value: val, used: false, createdAt: createdAt });
+            }
+            alert(`✅ تم إنشاء دفعة من ${count} كروت بقيمة ${val} د.ل (صالحة 30 يوم) بنجاح.`);
+            logAdminAction(`إنشاء دفعة كروت ${count} كرت بقيمة ${val} د.ل`);
+        });
+
+        window.approveRegistration = (type, phone, data) => {
+            let targetPath = (type === 'زبون') ? 'clients/' + phone : 'drivers/' + phone;
+            db.ref(targetPath).set(data).then(() => {
+                db.ref('pending_registrations/' + (type === 'زبون' ? 'clients' : 'drivers') + '/' + phone).remove().then(() => {
+                    alert(`✅ تم اعتماد تسجيل ${type} (${phone}) بنجاح.`);
+                    logAdminAction(`اعتماد تسجيل ${type}: ${phone}`);
+                });
+            });
+        };
+
+        window.rejectRegistration = (type, phone) => {
+            if(confirm('هل أنت متأكد من رفض وحذف طلب التسجيل؟')) {
+                db.ref('pending_registrations/' + (type === 'زبون' ? 'clients' : 'drivers') + '/' + phone).remove().then(() => {
+                    alert('✅ تم رفض الطلب وحذفه.');
+                    logAdminAction(`رفض تسجيل ${type}: ${phone}`);
+                });
+            }
+        };
+
+        window.deleteClient = (phone) => {
+            if(confirm(`هل أنت متأكد من حذف الزبون رقم ${phone}؟`)) {
+                db.ref('clients/' + phone).remove().then(() => {
+                    alert('✅ تم حذف الزبون بنجاح.');
+                    logAdminAction(`حذف الزبون ${phone}`);
+                });
+            }
+        };
+
+        window.deleteDriver = (phone) => {
+            if(confirm(`هل أنت متأكد من حذف السائق رقم ${phone}؟`)) {
+                db.ref('drivers/' + phone).remove().then(() => {
+                    alert('✅ تم حذف السائق بنجاح.');
+                    logAdminAction(`حذف السائق ${phone}`);
+                });
+            }
+        };
+
+        function loadAdminPanelData() {
+            db.ref('system_revenues').on('value', snap => {
+                const disp = document.getElementById('adminTotalRevenueDisplay');
+                if(disp) disp.innerText = (snap.val() || 0) + ' د.ل';
+            });
+
+            db.ref('revenue_transactions').on('value', snap => {
+                const div = document.getElementById('adminRevenueDetailsTable');
+                const data = snap.val();
+                if(!div) return;
+                div.innerHTML = '';
+                if(!data) { div.innerHTML = '<p style="font-size:0.85rem;">لا توجد عمليات إيرادات مسجلة بعد.</p>'; return; }
+                let html = '<table class="data-table"><tr><th>التوقيت</th><th>وصف العملية</th><th>المبلغ</th></tr>';
+                Object.keys(data).reverse().forEach(k => {
+                    let tx = data[k];
+                    html += `<tr><td>${tx.time}</td><td>${tx.description}</td><td><b style="color:#047857;">+${tx.amount} د.ل</b></td></tr>`;
+                });
+                div.innerHTML = html + '</table>';
+            });
+
+            // كشف المشرفين المساعدين في لوحة الإدارة
+            db.ref('sub_admins').on('value', snap => {
+                const div = document.getElementById('adminSubAdminsTable');
+                const data = snap.val();
+                if(!div) return;
+                div.innerHTML = '';
+                if(!data) { div.innerHTML = '<p style="font-size:0.85rem;">لا توجد مشرفون فرعيون مضافون.</p>'; return; }
+                let html = '<table class="data-table"><tr><th>اسم المشرف</th><th>إجراء الحذف</th></tr>';
+                Object.keys(data).forEach(username => {
+                    html += `<tr><td><b>${username}</b></td><td><button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="deleteSubAdmin('${username}')">حذف المشرف</button></td></tr>`;
+                });
+                div.innerHTML = html + '</table>';
+            });
+
+            db.ref('pending_registrations').on('value', snap => {
+                const div = document.getElementById('adminPendingRegistrationsList');
+                const data = snap.val();
+                if(!div) return;
+                div.innerHTML = '';
+                if(!data) { div.innerHTML = '<p style="font-size:0.85rem;">لا توجد طلبات تسجيل معلقة.</p>'; return; }
+
+                let html = '<table class="data-table"><tr><th>النوع</th><th>الاسم</th><th>الهاتف</th><th>المستندات والصور المرفوعة (محفوظة)</th><th>الإجراء</th></tr>';
+                let hasAny = false;
+
+                if(data.clients) {
+                    Object.keys(data.clients).forEach(phone => {
+                        let c = data.clients[phone];
+                        hasAny = true;
+                        let jsonStr = JSON.stringify(c).replace(/"/g, '&quot;');
+                        html += `<tr><td>زبون</td><td>${c.name}</td><td>${phone}</td><td>هوية: ${c.idNumber} (${c.idPlace})</td>` +
+                                `<td><button class="btn btn-success" style="padding:2px 5px; font-size:0.7rem;" onclick="approveRegistration('زبون', '${phone}', ${jsonStr})">موافقة</button> ` +
+                                `<button class="btn btn-danger" style="padding:2px 5px; font-size:0.7rem;" onclick="rejectRegistration('زبون', '${phone}')">رفض</button></td></tr>`;
+                    });
+                }
+
+                if(data.drivers) {
+                    Object.keys(data.drivers).forEach(phone => {
+                        let d = data.drivers[phone];
+                        hasAny = true;
+                        window._pendingDriversCache = window._pendingDriversCache || {};
+                        window._pendingDriversCache[phone] = d;
+
+                        let imgLinks = '';
+                        if(d.carImg) imgLinks += `<button class="btn" style="padding:2px 6px; font-size:0.7rem; background:#0284c7; margin:2px;" onclick="openImageModal(window._pendingDriversCache['${phone}'].carImg, 'صورة السيارة - ${d.fullName}')">[صورة السيارة]</button> `;
+                        if(d.passImg) imgLinks += `<button class="btn" style="padding:2px 6px; font-size:0.7rem; background:#0284c7; margin:2px;" onclick="openImageModal(window._pendingDriversCache['${phone}'].passImg, 'الهوية/الجواز - ${d.fullName}')">[الهوية/الجواز]</button> `;
+                        if(d.bookImg) imgLinks += `<button class="btn" style="padding:2px 6px; font-size:0.7rem; background:#0284c7; margin:2px;" onclick="openImageModal(window._pendingDriversCache['${phone}'].bookImg, 'كتيب المركبة - ${d.fullName}')">[كتيب المركبة]</button>`;
+
+                        html += `<tr><td>سائق</td><td>${d.fullName}</td><td>${phone}</td><td><b>رقم المركبة: ${d.carPlate || '-'}</b><br>هوية: ${d.idNumber}<br>المستندات المحفوظة: ${imgLinks || 'لا توجد'}</td>` +
+                                `<td><button class="btn btn-success" style="padding:2px 5px; font-size:0.7rem;" onclick="approveRegistration('سائق', '${phone}', window._pendingDriversCache['${phone}'])">موافقة</button> ` +
+                                `<button class="btn btn-danger" style="padding:2px 5px; font-size:0.7rem;" onclick="rejectRegistration('سائق', '${phone}')">رفض</button></td></tr>`;
+                    });
+                }
+
+                div.innerHTML = hasAny ? html + '</table>' : '<p style="font-size:0.85rem;">لا توجد طلبات تسجيل معلقة.</p>';
+            });
+
+            db.ref('system_logs').on('value', snap => {
+                const div = document.getElementById('adminSystemLogTable');
+                const data = snap.val();
+                if(!div) return;
+                div.innerHTML = '';
+                if(!data) { div.innerHTML = '<p style="font-size:0.85rem;">لا توجد سجلات بعد.</p>'; return; }
+                let html = '<table class="data-table"><tr><th>التوقيت</th><th>العملية</th></tr>';
+                Object.keys(data).reverse().forEach(k => {
+                    let log = data[k];
+                    html += `<tr><td style="font-size:0.75rem;">${log.time}</td><td>${log.text}</td></tr>`;
+                });
+                div.innerHTML = html + '</table>';
+            });
+
+            db.ref('cards').on('value', snap => {
+                const div = document.getElementById('adminCardsListTable');
+                const data = snap.val();
+                if(!div) return;
+                div.innerHTML = '';
+                if(!data) return;
+                let html = '<table class="data-table"><tr><th>الكود</th><th>القيمة</th><th>الحالة</th></tr>';
+                Object.keys(data).forEach(c => {
+                    html += `<tr><td><b>${c}</b></td><td>${data[c].value} د.ل</td><td>${data[c].used ? 'مستخدم' : 'متاح'}</td></tr>`;
+                });
+                div.innerHTML = html + '</table>';
+            });
+
+            db.ref('clients').on('value', snap => {
+                const div = document.getElementById('adminClientsTable');
+                const data = snap.val();
+                if(!div) return;
+                div.innerHTML = '';
+                if(!data) { div.innerHTML = '<p style="font-size:0.85rem;">لا توجد بيانات.</p>'; return; }
+                let html = '<table class="data-table"><tr><th>الاسم</th><th>الهاتف</th><th>الهوية</th><th>الرحلات</th><th>المحفظة</th><th>حذف</th></tr>';
+                Object.keys(data).forEach(p => {
+                    html += `<tr><td>${data[p].name}</td><td>${p}</td><td>${data[p].idNumber || '-'}</td><td>${data[p].completedTrips || 0}</td><td>${data[p].wallet || 0} د.ل</td>` +
+                            `<td><button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="deleteClient('${p}')">حذف</button></td></tr>`;
+                });
+                div.innerHTML = html + '</table>';
+            });
+
+            db.ref('drivers').on('value', snap => {
+                const div = document.getElementById('adminDriversWalletTable');
+                const data = snap.val();
+                if(!div) return;
+                div.innerHTML = '';
+                if(!data) { div.innerHTML = '<p style="font-size:0.85rem;">لا توجد بيانات.</p>'; return; }
+                let html = '<table class="data-table"><tr><th>السائق</th><th>الهاتف</th><th>رقم المركبة</th><th>الرحلات</th><th>الرصيد</th><th>حذف</th></tr>';
+                Object.keys(data).forEach(p => {
+                    let w = data[p].wallet || 0;
+                    let star = data[p].starBadge ? ' ⭐' : '';
+                    let color = w <= 10 ? 'color:red; font-weight:bold;' : 'color:green;';
+                    html += `<tr><td>${data[p].fullName}${star}</td><td>${p}</td><td><b>${data[p].carPlate || '-'}</b></td><td>${data[p].completedTrips || 0}</td><td style="${color}">${w} د.ل</td>` +
+                            `<td><button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="deleteDriver('${p}')">حذف</button></td></tr>`;
+                });
+                div.innerHTML = html + '</table>';
+            });
         }
     </script>
 </body>
