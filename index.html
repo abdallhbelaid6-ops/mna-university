@@ -3,1546 +3,881 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>وصلني الشاطئ - المنظومة الذكية المتكاملة</title>
+    <title>جامعة المنارة العلمية الأهلية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     <style>
-        :root {
-            --primary: #0088cc;
-            --primary-dark: #006699;
-            --secondary: #ff9900;
-            --accent: #28a745;
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-main: #333333;
-            --text-muted: #666666;
-            --danger: #dc3545;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); display: flex; min-height: 100vh; flex-direction: row; }
-        .sidebar { width: 240px; background: linear-gradient(180deg, #004080, #006699); color: white; display: flex; flex-direction: column; position: fixed; height: 100vh; right: 0; top: 0; z-index: 1000; box-shadow: -4px 0 15px rgba(0,0,0,0.15); }
-        .sidebar-header { padding: 20px 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; user-select: none; }
-        .sidebar-header h2 { font-size: 1.2rem; color: #ff9900; font-weight: 900; pointer-events: none; }
-        .sidebar-menu { list-style: none; padding: 10px 0; flex: 1; overflow-y: auto; }
-        .sidebar-menu li { padding: 12px 15px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 600; font-size: 0.95rem; transition: 0.3s; border-right: 4px solid transparent; }
-        .sidebar-menu li:hover, .sidebar-menu li.active { background: rgba(255,255,255,0.1); border-right-color: #ff9900; color: #ff9900; }
-        .sidebar-menu li i { width: 20px; text-align: center; pointer-events: none; }
-        .sidebar-footer { padding: 12px; display: flex; justify-content: center; align-items: center; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.75rem; color: #cbd5e1; }
-        .main-content { margin-right: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; width: calc(100% - 240px); }
-        header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; padding: 12px 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 900; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .header-title h1 { font-size: 1.1rem; font-weight: 900; }
-        .status-badge { background: rgba(255, 255, 255, 0.2); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; }
-        .status-dot { width: 8px; height: 8px; background-color: #ffc107; border-radius: 50%; display: inline-block; }
-        .status-dot.connected { background-color: #28a745; box-shadow: 0 0 8px #28a745; }
-        .container { max-width: 1000px; margin: 15px auto; padding: 0 15px; width: 100%; flex: 1; }
-        .card { background: var(--card-bg); border-radius: 14px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; display: none; }
-        .card.active { display: block; animation: fadeIn 0.4s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        h2.section-title { font-size: 1.15rem; color: var(--primary-dark); margin-bottom: 15px; border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; }
-        .sub-switch-btns { display: flex; gap: 8px; margin-bottom: 15px; }
-        .sub-btn { flex: 1; padding: 8px; border: 2px solid var(--primary); background: transparent; color: var(--primary); font-weight: bold; font-size: 0.9rem; border-radius: 8px; cursor: pointer; transition: 0.3s; }
-        .sub-btn.active { background: var(--primary); color: white; }
-        .form-section { display: none; }
-        .form-section.active { display: block; }
-        .form-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.85rem; }
-        input, select, textarea { width: 100%; padding: 10px; border: 2px solid #e1e8ed; border-radius: 8px; font-size: 0.95rem; outline: none; background: #fff; }
-        input:focus, select:focus, textarea:focus { border-color: var(--primary); }
-        .btn { background: var(--primary); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-size: 0.95rem; font-weight: 700; cursor: pointer; transition: background 0.3s; text-align: center; text-decoration: none; display: inline-block; }
-        .btn:hover { background: var(--primary-dark); }
-        .btn-success { background: var(--accent); }
-        .btn-danger { background: var(--danger); }
-        .driver-order-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
-        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
-        .data-table th, .data-table td { border: 1px solid #e2e8f0; padding: 8px; text-align: right; }
-        .data-table th { background: #f1f5f9; }
-        .hero-banner { background: linear-gradient(rgba(0,102,153,0.85), rgba(0,64,128,0.9)), url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80'); background-size: cover; background-position: center; border-radius: 14px; padding: 30px 15px; color: white; text-align: center; margin-bottom: 20px; }
-        .hero-banner h1 { font-size: 1.6rem; font-weight: 900; margin-bottom: 8px; color: #ff9900; }
-        .services-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
-        .service-card { background: white; border-radius: 14px; padding: 15px; border: 2px solid #e2e8f0; text-align: center; }
-        .service-card h3 { color: var(--primary-dark); margin-bottom: 8px; font-size: 1.05rem; }
-        .legal-box { background: #fffbeb; border: 1px solid #fde68a; padding: 12px; border-radius: 8px; font-size: 0.8rem; color: #92400e; margin-bottom: 12px; line-height: 1.5; }
-        .whatsapp-alert { background: #ecfdf5; border: 1px solid #a7f3d0; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; color: #065f46; display: flex; align-items: center; gap: 10px; }
-        .whatsapp-alert i { font-size: 1.4rem; color: #10b981; }
-        .downloads-ticker { background: linear-gradient(135deg, #0284c7, #0369a1); color: white; padding: 12px 15px; border-radius: 10px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
-        footer { text-align: center; padding: 12px; font-size: 0.8rem; color: var(--text-muted); background: white; border-top: 1px solid #eaeaea; margin-top: auto; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', Tahoma, sans-serif; }
+        body { background-color: #f4f6f9; color: #333; }
         
-        .admin-top-bar { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 12px 15px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.05); margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
-        .admin-top-bar h2 { font-size: 1.1rem; color: #333; display: flex; align-items: center; gap: 8px; }
-        .admin-nav-tabs { display: flex; gap: 6px; overflow-x: auto; width: 100%; padding-bottom: 5px; }
-        .admin-tab-btn { flex: 1; min-width: 100px; padding: 10px 6px; text-align: center; background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 8px; font-size: 0.78rem; font-weight: bold; color: #475569; cursor: pointer; transition: 0.3s; }
-        .admin-tab-btn.active { background: #0284c7; color: white; border-color: #0284c7; box-shadow: 0 4px 10px rgba(2,132,199,0.3); }
+        .top-bar { background-color: #061930; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 10px 50px; font-size: 13px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .top-bar-left, .top-bar-right { display: flex; align-items: center; gap: 20px; }
+        .top-bar a { color: #fff; text-decoration: none; cursor: pointer; transition: color 0.3s; }
+        .top-bar a:hover { color: #e9c46a; }
 
-        @media(max-width: 768px) {
-            body { flex-direction: column; }
-            .sidebar { width: 100%; height: 60px; position: fixed; bottom: 0; top: auto; right: 0; flex-direction: row; justify-content: space-around; align-items: center; padding: 0 5px; }
-            .sidebar-header { display: none; }
-            .sidebar-menu { display: flex; flex-direction: row; width: 100%; justify-content: space-around; padding: 0; }
-            .sidebar-menu li { flex-direction: column; padding: 6px; font-size: 0.75rem; gap: 3px; border-right: none; border-top: 3px solid transparent; text-align: center; }
-            .sidebar-menu li.active { border-top-color: #ff9900; }
-            .sidebar-footer { display: none; }
-            .main-content { margin-right: 0; width: 100%; margin-bottom: 60px; }
-            .services-grid { grid-template-columns: 1fr; }
+        header { background-color: #0b2545; color: #fff; display: flex; justify-content: space-between; align-items: center; padding: 15px 50px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .logo-area { display: flex; align-items: center; gap: 15px; text-decoration: none; color: #fff; cursor: pointer; text-align: right; }
+        .logo-area h1 { font-size: 19px; font-weight: 900; line-height: 1.3; }
+        .logo-area span { display: block; font-size: 11px; color: #e9c46a; letter-spacing: 1px; font-weight: 600; }
+        .university-logo { width: 52px; height: 52px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #e9c46a; }
+        
+        nav { display: flex; align-items: center; gap: 25px; }
+        nav a { color: #fff; text-decoration: none; font-size: 15px; transition: color 0.3s; cursor: pointer; font-weight: 600; }
+        nav a:hover, nav a.active { color: #e9c46a; }
+
+        .dropdown { position: relative; display: inline-block; }
+        .dropbtn { background-color: #134074; color: white; padding: 10px 18px; font-size: 14px; border: none; cursor: pointer; border-radius: 6px; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: background 0.3s; }
+        .dropbtn:hover { background-color: #1d5b9e; }
+        .dropdown-content { display: none; position: absolute; left: 0; background-color: #ffffff; min-width: 280px; box-shadow: 0px 8px 16px rgba(0,0,0,0.2); z-index: 10; border-radius: 6px; overflow: hidden; }
+        .dropdown-content a { color: #333; padding: 12px 16px; text-decoration: none; display: block; font-size: 14px; border-bottom: 1px solid #f1f1f1; cursor: pointer; font-weight: 600; }
+        .dropdown-content a:hover { background-color: #f8f9fa; color: #0b2545; }
+        .dropdown:hover .dropdown-content { display: block; }
+
+        .hero { background: linear-gradient(rgba(11, 37, 69, 0.85), rgba(11, 37, 69, 0.9)), url('https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1200&q=80') center/cover; color: white; padding: 90px 50px; display: flex; justify-content: space-between; align-items: center; }
+        .hero-content { max-width: 650px; }
+        .hero-badge { color: #e9c46a; font-weight: bold; font-size: 14px; margin-bottom: 10px; display: inline-block; border-bottom: 2px solid #e9c46a; padding-bottom: 3px; }
+        .hero h2 { font-size: 38px; margin-bottom: 15px; font-weight: 900; line-height: 1.3; }
+        .hero p { font-size: 16px; color: #e2e8f0; line-height: 1.7; margin-bottom: 25px; }
+        .btn-hero { background-color: #e9c46a; color: #0b2545; padding: 12px 25px; border-radius: 6px; text-decoration: none; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: background 0.3s; cursor: pointer; border: none; }
+        .btn-hero:hover { background-color: #f4a261; }
+
+        .hero-badge-box { background: rgba(11, 37, 69, 0.85); border: 1px solid rgba(233, 196, 106, 0.5); padding: 20px; border-radius: 8px; text-align: center; backdrop-filter: blur(5px); max-width: 320px; }
+        .hero-badge-box h4 { color: #e9c46a; font-size: 15px; margin-bottom: 8px; font-weight: 700; }
+        .hero-badge-box p { font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+
+        .features-bar { background: #fff; max-width: 1150px; margin: -35px auto 40px auto; position: relative; z-index: 5; display: grid; grid-template-columns: repeat(4, 1fr); border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; overflow: hidden; }
+        .feature-item { padding: 25px 20px; display: flex; align-items: center; gap: 15px; border-left: 1px solid #e9ecef; }
+        .feature-item:last-child { border-left: none; }
+        .feature-icon { width: 50px; height: 50px; background: #0b2545; color: #e9c46a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+        .feature-text h4 { font-size: 15px; color: #0b2545; margin-bottom: 3px; font-weight: 700; }
+        .feature-text p { font-size: 12px; color: #666; }
+
+        .container { max-width: 1150px; margin: 0 auto; padding: 0 20px; }
+        
+        .colleges-section { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-bottom: 40px; }
+        .colleges-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        .college-card { background: #fff; padding: 25px 20px; border-radius: 8px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,0.04); border-top: 4px solid #0b2545; transition: transform 0.3s, box-shadow 0.3s; display: flex; flex-direction: column; justify-content: space-between; }
+        .college-card:hover { transform: translateY(-5px); box-shadow: 0 8px 15px rgba(0,0,0,0.1); }
+        .college-icon { width: 60px; height: 60px; background: #f0f4f8; color: #0b2545; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px auto; font-size: 24px; }
+        .college-card h3 { font-size: 17px; color: #0b2545; margin-bottom: 8px; font-weight: 700; }
+        .college-card p { font-size: 12px; color: #666; margin-bottom: 15px; line-height: 1.5; }
+        .college-link { color: #0b2545; text-decoration: none; font-size: 13px; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; transition: color 0.3s; }
+        .college-link:hover { color: #e9c46a; }
+
+        .stats-card { background: #0b2545; color: #fff; padding: 30px 20px; border-radius: 8px; display: flex; flex-direction: column; justify-content: space-around; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .stat-row { display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 15px; }
+        .stat-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .stat-row svg { width: 32px; height: 32px; fill: #e9c46a; flex-shrink: 0; }
+        .stat-info h5 { font-size: 20px; font-weight: 700; color: #fff; }
+        .stat-info span { font-size: 13px; color: #cbd5e1; }
+
+        .page-content { display: none; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-top: 20px; margin-bottom: 40px; }
+        .page-content h2 { color: #0b2545; margin-bottom: 15px; border-bottom: 2px solid #e9c46a; padding-bottom: 10px; font-weight: 700; }
+        
+        .login-box { max-width: 450px; margin: 20px auto; background: #fdfdfd; padding: 30px; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .login-box h3 { color: #0b2545; margin-bottom: 15px; font-size: 18px; border-bottom: 1px solid #eee; padding-bottom: 8px; font-weight: 700; }
+
+        .form-group { margin-bottom: 20px; text-align: right; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 700; color: #0b2545; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+        .btn-main { background-color: #0b2545; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 15px; transition: background 0.3s; width: 100%; }
+        .btn-main:hover { background-color: #134074; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; font-size: 14px; }
+        th { background-color: #0b2545; color: white; }
+
+        .back-btn { display: inline-block; margin-bottom: 20px; background: #e9c46a; color: #0b2545; padding: 8px 15px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        .back-btn:hover { background: #f4a261; }
+
+        .bottom-ticker { background-color: #061930; color: #fff; padding: 12px 50px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .ticker-content { display: flex; align-items: center; gap: 15px; width: 80%; overflow: hidden; }
+        .ticker-badge { background: #e9c46a; color: #0b2545; padding: 3px 10px; border-radius: 4px; font-weight: bold; font-size: 12px; flex-shrink: 0; }
+        #tickerText { white-space: nowrap; animation: ticker 25s linear infinite; color: #e2e8f0; }
+
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
         }
+
+        .hidden-admin-trigger { background: transparent; border: none; color: #8494ab; font-size: 11px; cursor: pointer; text-decoration: underline; margin-top: 10px; display: inline-block; }
+        .hidden-admin-trigger:hover { color: #e9c46a; }
+
+        footer { text-align: center; padding: 25px; background-color: #0b2545; color: white; font-size: 14px; line-height: 1.6; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="sidebar-header" id="adminSecretTrigger" title="بوابة الإدارة">
-            <h2><i class="fa-solid fa-car-side"></i> وصلني</h2>
+    <div class="top-bar">
+        <div class="top-bar-right">
+            <span id="topBarLocation">📍 سبها - ليبيا</span>
+            <span>📅 الخميس 1 أكتوبر 2026</span>
         </div>
-        <ul class="sidebar-menu">
-            <li class="active" data-tab="homeTab"><i class="fa-solid fa-house"></i> <span>الرئيسية</span></li>
-            <li data-tab="clientPortalTab"><i class="fa-solid fa-user"></i> <span>الزبون</span></li>
-            <li data-tab="driverPortalTab"><i class="fa-solid fa-car"></i> <span>السائق</span></li>
-        </ul>
-        <div class="sidebar-footer">
-            <span>وادي الشاطئ © 2026</span>
+        <div class="top-bar-left">
+            <a onclick="openPortal('student')">بوابة الطلبة 👤</a>
         </div>
     </div>
 
-    <div class="main-content">
-        <header>
-            <div class="header-title">
-                <h1><i class="fa-solid fa-car-side"></i> وصلني الشاطئ - المنظومة الذكية</h1>
+    <header>
+        <a class="logo-area" onclick="showMainHome()">
+            <div class="university-logo">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="#0b2545"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
             </div>
-            <div class="status-badge">
-                <span class="status-dot" id="connectionDot"></span>
-                <span id="connectionText">جاري الاتصال...</span>
+            <div>
+                <h1>جامعة المنارة العلمية الأهلية</h1>
+                <span>علم .. إبداع .. مستقبل</span>
             </div>
-        </header>
+        </a>
+        
+        <nav>
+            <a class="active" onclick="showMainHome()">الرئيسية</a>
+            <a onclick="scrollToSection('colleges')">الأقسام العلمية</a>
+            <a onclick="openDynamicPage('programs')">البرامج الدراسية</a>
+            <a onclick="openDynamicPage('guides')">الأدلة والإجراءات</a>
+            <a onclick="openNewsPage()">الأخبار</a>
+            <a onclick="openDynamicPage('contact')">اتصل بنا</a>
+        </nav>
+
+        <div class="dropdown">
+            <button class="dropbtn">الخدمات الإلكترونية ▾</button>
+            <div class="dropdown-content">
+                <a onclick="openPortal('student')">بوابة الطلبة (السجل الدراسي)</a>
+                <a onclick="openPortal('employee')">بوابة الموظفين (تسجيل الطلاب والسداد)</a>
+                <a onclick="openPortal('faculty')">بوابة أعضاء هيئة التدريس (رصد الدرجات)</a>
+            </div>
+        </div>
+    </header>
+
+    <div id="mainContainer">
+        <section class="hero">
+            <div class="hero-content">
+                <span class="hero-badge">معاً نصنع مستقبلاً أفضل</span>
+                <h2>بناء الإنسان ... صناعة المستقبل</h2>
+                <p>جامعة أهلية متخصصة في تقديم تعليم جامعي متميز يجمع بين الجودة الأكاديمية والبيئة الحديثة.</p>
+                <button class="btn-hero" onclick="scrollToSection('colleges')">تعرف على الجامعة ←</button>
+            </div>
+            <div class="hero-badge-box">
+                <h4>🏛 جامعة معتمدة</h4>
+                <p>تخضع لإشراف وزارة التعليم العالي والبحث العلمي ومعتمدة من مركز ضمان الجودة.</p>
+            </div>
+        </section>
+
+        <div class="features-bar">
+            <div class="feature-item">
+                <div class="feature-icon">👥</div>
+                <div class="feature-text">
+                    <h4>كادر أكاديمي متميز</h4>
+                    <p>خبرات رفيعة المستوى</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🏛️</div>
+                <div class="feature-text">
+                    <h4>بنية تحتية</h4>
+                    <p>تجهيزات حديثة متكاملة</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🎖️</div>
+                <div class="feature-text">
+                    <h4>برامج معتمدة</h4>
+                    <p>جودة عالية ومواكبة</p>
+                </div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">📖</div>
+                <div class="feature-text">
+                    <h4>بيئة تعليمية</h4>
+                    <p>محفزة للإبداع والبحث</p>
+                </div>
+            </div>
+        </div>
 
         <div class="container">
-
-            <!-- الرئيسية -->
-            <div id="homeTab" class="card active">
-                <div class="hero-banner">
-                    <h1>وصلني الشاطئ</h1>
-                    <p>خدمات التنقل والتوصيل الفورية في كافة مناطق وادي الشاطئ</p>
-                    <p style="margin-top: 8px; font-size: 0.9rem; color: #e2e8f0; font-weight: bold;"><i class="fa-solid fa-shield-halved"></i> التطبيق المحلي وامن</p>
-                </div>
-
-                <!-- شريط تنزيل الملفات المرفوعة من الإدارة -->
-                <div class="downloads-ticker">
-                    <div>
-                        <i class="fa-solid fa-cloud-arrow-down" style="font-size: 1.3rem; margin-left: 8px;"></i>
-                        <strong>الملفات والتطبيقات العامة للإدارة:</strong>
-                    </div>
-                    <div id="publicDownloadsBar" style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <span style="font-size: 0.85rem;">لا توجد ملفات مرفوعة حالياً.</span>
-                    </div>
-                </div>
-
-                <div class="whatsapp-alert">
-                    <i class="fa-brands fa-whatsapp"></i>
-                    <div>
-                        <strong>تنبيه هامة:</strong> للحصول على كروت الشحن، يمكنك مراسلة الإدارة مباشرة عبر رقم الواتساب: <a href="https://wa.me/218913368086" target="_blank" style="font-weight: bold; color: #047857; text-decoration: underline;">0913368086</a>
-                    </div>
-                </div>
-                <div class="services-grid">
-                    <div class="service-card">
-                        <h3><i class="fa-solid fa-box"></i> توصيل الطلبات</h3>
-                        <p>توصيل آمن وسريع لطلباتك.</p>
-                        <button class="btn" style="margin-top:12px;" onclick="switchTab('clientPortalTab')">اطلب توصيل</button>
-                    </div>
-                    <div class="service-card">
-                        <h3><i class="fa-solid fa-taxi"></i> خدمة التاكسي</h3>
-                        <p>راحة وأمان في كل مشوار داخل المنطقة.</p>
-                        <button class="btn btn-success" style="margin-top:12px;" onclick="switchTab('clientPortalTab')">اطلب تكسي</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- لوحة الزبون -->
-            <div id="clientPortalTab" class="card">
-                <h2 class="section-title">لوحة خدمات الزبون</h2>
-                <div class="whatsapp-alert">
-                    <i class="fa-brands fa-whatsapp"></i>
-                    <div>لطلب كروت الشحن، راسل الإدارة عبر واتساب: <a href="https://wa.me/218913368086" target="_blank" style="font-weight:bold; color:#047857;">0913368086</a></div>
-                </div>
-                <div class="sub-switch-btns" id="clientAuthSwitchBtns">
-                    <button class="sub-btn active" id="clientLoginSwitchBtn">تسجيل الدخول</button>
-                    <button class="sub-btn" id="clientRegSwitchBtn">حساب جديد</button>
-                </div>
-
-                <div id="clientLoginBox" class="form-section active" style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                    <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="clientLoginPhone" placeholder="091xxxxxxx"></div>
-                    <div class="form-group"><label>الرقم السري:</label><input type="password" id="clientLoginPin" placeholder="الرقم السري"></div>
-                    <button class="btn btn-success" id="clientLoginBtn">دخول</button>
-                </div>
-
-                <div id="clientRegisterBox" class="form-section" style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                    <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="clientRegName" placeholder="الاسم الكامل"></div>
-                    <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="clientRegPhone" placeholder="091xxxxxxx"></div>
-                    <div class="form-group"><label>الرقم السري:</label><input type="password" id="clientRegPin" placeholder="رقم سري"></div>
-                    <div class="form-group"><label>رقم الهوية الشخصية:</label><input type="text" id="clientRegIdNumber" placeholder="رقم الهوية الوطنية أو جواز السفر"></div>
-                    <div class="form-group"><label>مكان الإصدار:</label><input type="text" id="clientRegIdPlace" placeholder="مكان الإصدار"></div>
-                    <div class="form-group"><label>تاريخ الإصدار:</label><input type="date" id="clientRegIdDate"></div>
-                    
-                    <div class="legal-box">
-                        <label><input type="checkbox" id="clientLegalCheck"> أُقرّ أنا الزبون بأن جميع البيانات والمعلومات التي قمت بإدخالها صحيحة وكاملة، وأتعهد باستخدام التطبيق بصورة مشروعة، وأتحمل كامل المسؤولية القانونية عن أي بيانات غير صحيحة أو وهمية أو أي إساءة في استخدام التطبيق، وفقًا للتشريعات واللوائح المعمول بها.</label>
-                    </div>
-                    <button class="btn btn-success" id="clientRegBtn">إرسال طلب تسجيل الزبون</button>
-                </div>
-
-                <div id="clientDashboardArea" style="display:none;">
-                    <div style="background: linear-gradient(135deg, #004080, #006699); color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
+            <div id="colleges" class="colleges-section">
+                <div class="colleges-grid">
+                    <div class="college-card">
                         <div>
-                            <p style="font-size: 0.9rem;">مرحباً: <span id="clientWelcomeName" style="font-weight:bold;"></span></p>
-                            <p style="margin-top: 3px; font-size: 0.8rem;">رصيد المحفظة: <span id="clientWalletDisplay" style="font-weight: bold; color: #ff9900;">0</span> د.ل | الرحلات: <span id="clientTripsCount" style="color:#ff9900; font-weight:bold;">0</span></p>
+                            <div class="college-icon">🧮</div>
+                            <h3>كلية المحاسبة</h3>
+                            <p>دقة في الأرقام .. ثقة في القرار</p>
                         </div>
-                        <button class="btn btn-danger" style="width: auto; padding: 6px 12px; font-size: 0.8rem;" id="clientLogoutBtn2">خروج</button>
+                        <a class="college-link" onclick="openDepartment('accounting')">استعرض القسم ومقرراته ←</a>
                     </div>
-
-                    <div style="background: #fffbeb; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #fde68a;">
-                        <h3 style="color: #b45309; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-ticket"></i> شحن المحفظة بكارت مسبق الدفع</h3>
-                        <p style="font-size: 0.8rem; color:#b45309; margin-bottom:8px;">للحصول على كروت الشحن، راسل الإدارة عبر واتساب: <a href="https://wa.me/218913368086" target="_blank" style="font-weight:bold;">0913368086</a></p>
-                        <div class="form-group"><label>أدخل كود الكرت:</label><input type="text" id="rechargeCardCode" placeholder="WAS-xxxx"></div>
-                        <button class="btn btn-success" style="background: #b45309;" id="submitRechargeBtn">تفعيل الكرت وشحن الرصيد فوراً</button>
-                    </div>
-
-                    <div style="background: #f0fdf4; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #bbf7d0;">
-                        <h3 style="color: #166534; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-money-bill-transfer"></i> تحويل رصيد للسائق من محفظتك</h3>
-                        <div class="form-group"><label>رقم هاتف السائق:</label><input type="tel" id="transferDriverPhone" placeholder="091xxxxxxx"></div>
-                        <div class="form-group"><label>المبلغ المراد تحويله (د.ل):</label><input type="number" id="transferAmount" placeholder="أدخل المبلغ"></div>
-                        <button class="btn btn-success" style="background: #166534;" id="submitTransferBtn">تحويل الرصيد فوراً للسائق</button>
-                    </div>
-
-                    <div style="background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 15px;">
-                        <h3 style="font-size: 1rem; color: var(--primary-dark); margin-bottom: 10px;">طلب رحلة أو خدمة جديدة</h3>
-                        <div class="form-group">
-                            <label>نوع الخدمة:</label>
-                            <select id="serviceType" onchange="toggleCargoField()">
-                                <option value="توصيل ركاب (تكسي)">توصيل ركاب (تكسي)</option>
-                                <option value="توصيل طلبات">توصيل طلبات</option>
-                                <option value="طلب سيارة نقل">طلب سيارة نقل (بضائع / أثاث - السعر بالاتفاق)</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>نوع الجنس (للطلب):</label>
-                            <select id="clientGenderType">
-                                <option value="رجالي / عادي">رحلة عادية أو رجالية (تظهر للسائقين الرجال)</option>
-                                <option value="انثى">رحلة نسائية خاصة (تظهر للسائقات النساء فقط)</option>
-                            </select>
-                        </div>
-
-                        <div class="form-group" id="cargoDetailsGroup" style="display: none; background: #f0fdf4; padding: 10px; border-radius: 8px; border: 1px solid #bbf7d0;">
-                            <label style="color: #166534;"><i class="fa-solid fa-box-open"></i> تفاصيل المطلوب نقله:</label>
-                            <textarea id="cargoDetailsInput" rows="2" placeholder="اكتب تفاصيل الحمولة أو الأثاث..."></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label>موقع الانطلاق:</label>
-                            <select id="pickupLocation" onchange="checkLocationPricing()"></select>
-                        </div>
-                        <div class="form-group">
-                            <label>الوجهة المقصودة:</label>
-                            <select id="dropoffLocation" onchange="checkLocationPricing()"></select>
-                        </div>
-
-                        <div class="form-group">
-                            <label>السعر المحدد من الإدارة للمسار:</label>
-                            <input type="text" id="clientFinalCalculatedPrice" readonly style="background: #edf2f7; font-weight: bold; color: var(--primary-dark);" value="10 د.ل (داخل المنطقة)">
-                        </div>
-
-                        <div class="form-group">
-                            <label>طريقة الدفع:</label>
-                            <select id="paymentMethod">
-                                <option value="كاش">نقدي (كاش)</option>
-                                <option value="محفظة">رصيد المحفظة</option>
-                                <option value="بطاقة أو حوالة">بطاقة أو حوالة مصرفية</option>
-                            </select>
-                        </div>
-
-                        <button class="btn" id="sendOrderBtn">إرسال الطلب فوراً للسائقين</button>
-                    </div>
-                </div>
-
-                <div id="clientOrdersWrapper" style="display:none; background: #fff; padding: 15px; border-radius: 12px; border: 1px solid #e2e8f0; margin-top: 15px;">
-                    <h3 style="font-size: 1rem; margin-bottom: 8px; color: var(--primary-dark);">طلباتي الحالية ومتابعة التتبع:</h3>
-                    <div id="clientActiveOrdersList"></div>
-                </div>
-            </div>
-
-            <!-- لوحة السائق -->
-            <div id="driverPortalTab" class="card">
-                <h2 class="section-title">لوحة تحكم السائقين</h2>
-                <div class="whatsapp-alert">
-                    <i class="fa-brands fa-whatsapp"></i>
-                    <div>لطلب كروت الشحن، راسل الإدارة عبر واتساب: <a href="https://wa.me/218913368086" target="_blank" style="font-weight:bold; color:#047857;">0913368086</a></div>
-                </div>
-                <div class="sub-switch-btns" id="driverAuthSwitchBtns">
-                    <button class="sub-btn active" id="driverLoginSwitchBtn">تسجيل الدخول</button>
-                    <button class="sub-btn" id="driverRegSwitchBtn">تسجيل كابتن جديد</button>
-                </div>
-
-                <div id="driverLoginBox" class="form-section active" style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                    <div class="form-group"><label>رقم هاتف (واتساب):</label><input type="tel" id="driverLoginPhone" placeholder="091xxxxxxx"></div>
-                    <button class="btn btn-success" id="driverLoginBtn">دخول الكابتن</button>
-                </div>
-
-                <div id="driverRegisterBox" class="form-section" style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
-                    <div class="form-group"><label>الاسم الكامل:</label><input type="text" id="driverRegName" placeholder="الاسم الكامل"></div>
-                    <div class="form-group"><label>رقم الهاتف:</label><input type="tel" id="driverRegPhone" placeholder="091xxxxxxx"></div>
-                    <div class="form-group"><label>نوع السيارة:</label><input type="text" id="driverRegCar" placeholder="نوع السيارة (مثال: تويوتا كورولا)"></div>
-                    <div class="form-group"><label>رقم المركبة (اللوحة المعدنية):</label><input type="text" id="driverRegCarPlate" placeholder="رقم اللوحة المعدنية"></div>
                     
-                    <div class="form-group">
-                        <label>تصنيف السائق (الجنس):</label>
-                        <select id="driverRegGender">
-                            <option value="ذكر">ذكر (يستقبل الطلبات العادية والرجالية والنقل)</option>
-                            <option value="انثى">انثى (تستقبل رحلات التكسي وتوصيل الطلبات النسائية والنقل فقط)</option>
-                        </select>
+                    <div class="college-card">
+                        <div>
+                            <div class="college-icon">📊</div>
+                            <h3>كلية الإدارة والأعمال</h3>
+                            <p>إدارة .. قيادة .. نجاح</p>
+                        </div>
+                        <a class="college-link" onclick="openDepartment('business')">استعرض القسم ومقرراته ←</a>
                     </div>
 
-                    <div class="form-group"><label>رقم الهوية الشخصية:</label><input type="text" id="driverRegIdNumber" placeholder="رقم الهوية الوطنية أو جواز السفر"></div>
-                    <div class="form-group"><label>مكان الإصدار:</label><input type="text" id="driverRegIdPlace" placeholder="مكان الإصدار"></div>
-                    <div class="form-group"><label>تاريخ الإصدار:</label><input type="date" id="driverRegIdDate"></div>
-
-                    <div class="form-group"><label><i class="fa-solid fa-car"></i> صورة السيارة (إلزامي):</label><input type="file" id="driverFileCar" accept="image/*" required></div>
-                    <div class="form-group"><label><i class="fa-solid fa-passport"></i> جواز السفر أو الهوية - صورة (إلزامي):</label><input type="file" id="driverFilePassport" accept="image/*" required></div>
-                    <div class="form-group"><label><i class="fa-solid fa-book"></i> كتيب المركبة - صورة (إلزامي):</label><input type="file" id="driverFileBook" accept="image/*" required></div>
-
-                    <div class="legal-box">
-                        <label><input type="checkbox" id="driverLegalCheck"> أُقرّ أنا السائق بأن جميع البيانات والمعلومات والمستندات التي قمت بتقديمها للتسجيل في التطبيق صحيحة وكاملة، وأتعهد بالالتزام بأنظمة وقواعد استخدام التطبيق، وحسن التعامل مع الزبائن، والمحافظة على سلامتهم وممتلكاتهم، وعدم إساءة استخدام التطبيق أو استغلاله لأي أغراض غير مشروعة. كما أتحمل كامل المسؤولية القانونية عن أي بيانات غير صحيحة أو وهمية، أو أي مخالفة أو إساءة استخدام تصدر مني أثناء استخدام التطبيق أو تقديم خدمات النقل والتوصيل.</label>
+                    <div class="college-card">
+                        <div>
+                            <div class="college-icon">⚖️</div>
+                            <h3>كلية القانون</h3>
+                            <p>العدالة .. اساس المجتمع</p>
+                        </div>
+                        <a class="college-link" onclick="openDepartment('law')">استعرض القسم ومقرراته ←</a>
                     </div>
-                    <button class="btn btn-success" id="driverRegBtn">إرسال طلب الانضمام للموافقة</button>
+
+                    <div class="college-card">
+                        <div>
+                            <div class="college-icon">💻</div>
+                            <h3>قسم تقنية المعلومات</h3>
+                            <p>الابتكار التقني .. صناعة البرمجيات</p>
+                        </div>
+                        <a class="college-link" onclick="openDepartment('it')">استعرض القسم ومقرراته ←</a>
+                    </div>
                 </div>
 
-                <div id="driverDashboardArea" style="display:none;">
-                    <div style="background: linear-gradient(135deg, #004080, #006699); color: white; padding: 15px; border-radius: 12px; margin-bottom: 15px;">
-                        <p style="font-size: 0.9rem;">الكابتن: <span id="driverWelcomeName" style="font-weight:bold;"></span> (<span id="driverGenderDisplay" style="color:#ff9900;"></span>)</p>
-                        <p style="margin-top: 5px; font-size: 0.85rem;">رصيد المحفظة: <span id="driverWalletBalance" style="font-weight:bold; color: #ff9900;">0</span> د.ل | الرحلات المنجزة: <span id="driverTripsCount" style="font-weight:bold; color:#ff9900;">0</span></p>
-                        <div id="driverBadgeBox" style="margin-top: 5px; font-size: 0.85rem; color: #ffebd2; font-weight: bold;"></div>
-                        <button class="btn btn-danger" style="width: auto; padding: 5px 10px; font-size: 0.75rem; margin-top: 8px;" id="driverLogoutBtn">خروج</button>
+                <div class="stats-card">
+                    <div class="stat-row">
+                        <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+                        <div class="stat-info">
+                            <h5>4</h5>
+                            <span>كليات وأقسام علمية</span>
+                        </div>
                     </div>
-
-                    <div style="background: #fffbeb; border: 1px solid #fde68a; padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85rem; color: #b45309;">
-                        <i class="fa-solid fa-award" style="color: #d97706; font-size: 1.1rem;"></i> <strong>ملاحظة تحفيزية للكابتن:</strong> سيحصل الكابتن على <strong>نجمة تقديرية (⭐) ورصيد مجاني في المحفظة</strong> فور وصوله وإنجازه لعدد <strong>30 رحلة</strong> بنجاح!
+                    <div class="stat-row">
+                        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                        <div class="stat-info">
+                            <h5>أعضاء هيئة تدريس</h5>
+                            <span>نخبة الأكاديميين</span>
+                        </div>
                     </div>
-
-                    <div style="background: #fffbeb; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #fde68a;">
-                        <h3 style="color: #b45309; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-ticket"></i> شحن محفظة الكابتن بكارت مسبق الدفع (خصم 1 د.ل رسوم تشغيل)</h3>
-                        <p style="font-size: 0.8rem; color:#b45309; margin-bottom:8px;">لطلب كروت الشحن، راسل الإدارة عبر واتساب: <a href="https://wa.me/218913368086" target="_blank" style="font-weight:bold;">0913368086</a></p>
-                        <div class="form-group"><label>أدخل كود الكرت:</label><input type="text" id="driverRechargeCardCode" placeholder="WAS-xxxx"></div>
-                        <button class="btn btn-success" style="background: #b45309;" id="driverSubmitRechargeBtn">تفعيل الكرت وشحن المحفظة</button>
-                    </div>
-
-                    <div style="margin-bottom: 12px; background: #e0f2fe; padding: 10px; border-radius: 8px; display:flex; gap:8px;">
-                        <button class="btn btn-success" style="padding: 8px; font-size: 0.85rem; flex:1;" id="shareLocationBtn"><i class="fa-solid fa-location-crosshairs"></i> مشاركة موقعي (GPS)</button>
-                        <button class="btn" style="padding: 8px; font-size: 0.85rem; flex:1; background:#0369a1;" id="enableNotifBtn"><i class="fa-solid fa-bell"></i> التنبيهات الصوتية مفعلة</button>
-                    </div>
-
-                    <div style="background: #f8fafc; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1; margin-bottom: 15px;">
-                        <h3 style="font-size: 0.95rem; color: var(--primary-dark); margin-bottom: 6px;"><i class="fa-solid fa-file-invoice-dollar"></i> كشف الحساب الشخصي للكابتن</h3>
-                        <div id="driverPersonalStatement" style="font-size: 0.85rem; color: #475569;">لا توجد معاملات مالية بعد.</div>
-                    </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <h3 style="font-size: 1rem; color: var(--primary-dark); margin-bottom: 8px;">الطلبات المتاحة (تلقائية بدون موافقة إدارية للرحلات)</h3>
-                        <div id="driversOrdersList"></div>
-                    </div>
-                    <div>
-                        <h3 style="font-size: 1rem; color: var(--primary-dark); margin-bottom: 8px;">كشف الرحلات وتواصل العملاء</h3>
-                        <div id="driverTripHistoryList"></div>
+                    <div class="stat-row">
+                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <div class="stat-info">
+                            <h5>طلابنا</h5>
+                            <span>كوادر المستقبل الواعد</span>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <!-- لوحة الإدارة العليا -->
-            <div id="adminTab" class="card">
-                
-                <div id="adminLoginBox" class="form-group" style="background: #fffbeb; padding: 25px; border-radius: 10px; border: 1px solid #fde68a; max-width: 500px; margin: 30px auto;">
-                    <h2 style="color: #92400e; margin-bottom: 15px; font-size: 1.2rem;"><i class="fa-solid fa-lock"></i> تسجيل دخول لوحة الإدارة العليا</h2>
-                    <label style="color: #92400e;">اسم المستخدم:</label>
-                    <input type="text" id="adminUsernameInput" placeholder="اسم المستخدم" style="margin-bottom:12px;">
-                    <label style="color: #92400e;">كلمة المرور:</label>
-                    <input type="password" id="adminPinInput" placeholder="كلمة المرور">
-                    <button class="btn" style="margin-top:15px; background: #92400e;" id="adminLoginBtn">دخول الإدارة</button>
-                </div>
-                
-                <div id="adminContentPanel" style="display:none;">
-                    
-                    <div class="admin-top-bar">
-                        <h2><i class="fa-solid fa-gauge-high" style="color:#0284c7;"></i> لوحة تحكم الإدارة العليا</h2>
-                        <button class="btn btn-danger" style="width: auto; padding: 8px 16px; font-size: 0.85rem;" id="adminLogoutBtn">خروج الإدارة</button>
-                    </div>
-
-                    <div class="admin-nav-tabs">
-                        <button class="admin-tab-btn active" onclick="switchAdminSection('revenues')">الإيرادات</button>
-                        <button class="admin-tab-btn" onclick="switchAdminSection('requests')">الطلبات</button>
-                        <button class="admin-tab-btn" onclick="switchAdminSection('regions')">المناطق</button>
-                        <button class="admin-tab-btn" onclick="switchAdminSection('cards')">الكروت</button>
-                        <button class="admin-tab-btn" onclick="switchAdminSection('users')">المستخدمين</button>
-                        <button class="admin-tab-btn" onclick="switchAdminSection('uploads')">الملفات العامة</button>
-                        <button class="admin-tab-btn" onclick="switchAdminSection('admins')">الأدمنز</button>
-                        <button class="admin-tab-btn" onclick="switchAdminSection('logs')">السجل</button>
-                    </div>
-
-                    <div id="adminSec_revenues" class="admin-sub-section" style="margin-top: 15px;">
-                        <div style="background: #ecfdf5; padding: 20px; border-radius: 10px; border: 1px solid #a7f3d0; margin-bottom: 15px;">
-                            <h3 style="color: #065f46; margin-bottom: 8px; font-size: 1.1rem;"><i class="fa-solid fa-vault"></i> إجمالي الإيرادات الموحدة للتطبيق</h3>
-                            <p style="font-size: 1.8rem; font-weight: bold; color: #047857;" id="adminTotalRevenueDisplay">0 د.ل</p>
-                        </div>
-                        <div style="background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1;">
-                            <h3 style="color: #0f172a; margin-bottom: 10px; font-size: 1rem;"><i class="fa-solid fa-list-check"></i> تفصيل عمليات الإيرادات</h3>
-                            <div id="adminRevenueDetailsTable" style="max-height: 250px; overflow-y: auto;"></div>
-                        </div>
-                    </div>
-
-                    <div id="adminSec_requests" class="admin-sub-section" style="margin-top: 15px; display: none;">
-                        <div style="background: #eef2ff; padding: 15px; border-radius: 10px; border: 1px solid #c7d2fe;">
-                            <h3 style="color: #3730a3; margin-bottom: 10px; font-size: 1.05rem;"><i class="fa-solid fa-clipboard-check"></i> طلبات التسجيل والمستندات المحفوظة</h3>
-                            <div id="adminPendingRegistrationsList" style="max-height: 350px; overflow-y: auto;"></div>
-                        </div>
-                    </div>
-
-                    <div id="adminSec_regions" class="admin-sub-section" style="margin-top: 15px; display: none;">
-                        <div style="background: #f0fdf4; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #bbf7d0;">
-                            <h3 style="color: #166534; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-map-pin"></i> إضافة منطقة أو مدينة جديدة للنظام</h3>
-                            <div class="form-group"><input type="text" id="newRegionInput" placeholder="أدخل اسم المنطقة الجديدة"></div>
-                            <button class="btn btn-success" style="background: #166534;" id="addNewRegionBtn">حفظ وإضافة المنطقة</button>
-                        </div>
-                        <div style="background: #e0f2fe; padding: 15px; border-radius: 10px; border: 1px solid #7dd3fc;">
-                            <h3 style="color: #0369a1; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-route"></i> تسعير المسارات</h3>
-                            <div class="form-group"><label>من منطقة:</label><select id="pricingPickup"></select></div>
-                            <div class="form-group"><label>إلى منطقة:</label><select id="pricingDropoff"></select></div>
-                            <div class="form-group"><label>السعر (د.ل):</label><input type="number" id="pricingAmount" placeholder="السعر"></div>
-                            <button class="btn btn-success" style="background: #0369a1;" id="saveRoutePriceBtn">حفظ السعر</button>
-                            <div id="adminSavedPricingTable" style="max-height: 180px; overflow-y: auto; margin-top:10px;"></div>
-                        </div>
-                    </div>
-
-                    <div id="adminSec_cards" class="admin-sub-section" style="margin-top: 15px; display: none;">
-                        <div style="background: #fef3c7; padding: 15px; border-radius: 10px; border: 1px solid #f59e0b;">
-                            <h3 style="color: #b45309; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-ticket"></i> إصدار الكروت وصلاحية 30 يوم</h3>
-                            <div class="form-group"><label>بادئة الكود:</label><input type="text" id="batchPrefix" value="WAS"></div>
-                            <div class="form-group"><label>العدد:</label><input type="number" id="batchCount" value="10"></div>
-                            <div class="form-group"><label>القيمة (د.ل):</label><input type="number" id="batchValue" value="20"></div>
-                            <button class="btn btn-success" style="background: #b45309; margin-bottom: 10px;" id="generateBatchCardsBtn">توليد الكروت</button>
-                            <div id="adminCardsListTable" style="max-height: 200px; overflow-y: auto;"></div>
-                        </div>
-                    </div>
-
-                    <div id="adminSec_users" class="admin-sub-section" style="margin-top: 15px; display: none;">
-                        <div style="background: #e6fffa; padding: 15px; border-radius: 10px; border: 1px solid #319795;">
-                            <h3 style="color: #234e52; margin-bottom: 8px; font-size: 1.05rem;"><i class="fa-solid fa-users"></i> كشف شامل بالمستخدمين</h3>
-                            <h4 style="font-size:0.9rem; color:#2c7a7b; margin-top:5px;">قائمة الزبائن المعتمدين:</h4>
-                            <div id="adminClientsTable" style="max-height: 180px; overflow-y: auto; margin-bottom:15px;"></div>
-                            <h4 style="font-size:0.9rem; color:#2c7a7b;">قائمة السائقين المعتمدين:</h4>
-                            <div id="adminDriversWalletTable" style="max-height: 180px; overflow-y: auto;"></div>
-                        </div>
-                    </div>
-
-                    <!-- قسم رفع الملفات العامة ليقوم العامة بتنزيلها -->
-                    <div id="adminSec_uploads" class="admin-sub-section" style="margin-top: 15px; display: none;">
-                        <div style="background: #e0f2fe; padding: 15px; border-radius: 10px; border: 1px solid #7dd3fc;">
-                            <h3 style="color: #0369a1; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-file-arrow-up"></i> رفع ملف أو تطبيق عام (ليقوم العامة بتنزيله)</h3>
-                            <div class="form-group"><label>عنوان الملف (مثال: تطبيق السائق APK الإصدار الأخير):</label><input type="text" id="uploadFileTitle" placeholder="اسم الملف أو الوصف"></div>
-                            <div class="form-group"><label>اختر الملف:</label><input type="file" id="uploadFileInput"></div>
-                            <button class="btn btn-success" style="background: #0369a1;" id="uploadPublicFileBtn">رفع ونشر الملف للعامة</button>
-                        </div>
-                        <div style="background: #fff; padding: 15px; border-radius: 10px; border: 1px solid #cbd5e1; margin-top: 15px;">
-                            <h3 style="color: #0f172a; margin-bottom: 8px; font-size: 1rem;">الملفات المنشورة حالياً:</h3>
-                            <div id="adminPublicFilesTable" style="max-height: 200px; overflow-y: auto;"></div>
-                        </div>
-                    </div>
-
-                    <!-- قسم إدارة الأدمنز مع إمكانية الحذف وتغيير الرقم السري للإدارة -->
-                    <div id="adminSec_admins" class="admin-sub-section" style="margin-top: 15px; display: none;">
-                        <div style="background: #fffbeb; padding: 15px; border-radius: 10px; border: 1px solid #fde68a; margin-bottom: 15px;">
-                            <h3 style="color: #b45309; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-key"></i> تغيير كلمة المرور للوحة الإدارة العليا</h3>
-                            <div class="form-group"><label>كلمة المرور الجديدة:</label><input type="password" id="newAdminPinPass" placeholder="أدخل الرقم السري الجديد"></div>
-                            <button class="btn btn-success" style="background: #b45309;" id="updateAdminPinBtn">حفظ وتحديث الرقم السري</button>
-                        </div>
-
-                        <div style="background: #fdf4ff; padding: 15px; border-radius: 10px; border: 1px solid #f0abfc;">
-                            <h3 style="color: #86198f; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-user-shield"></i> كشف وإدارة المشرفين الفرعيين (الأدمنز)</h3>
-                            <div class="form-group"><input type="text" id="newAdminUser" placeholder="اسم المستخدم للمشرف الجديد"></div>
-                            <div class="form-group"><input type="password" id="newAdminPass" placeholder="كلمة المرور"></div>
-                            <button class="btn btn-success" style="background: #86198f; margin-bottom: 10px;" id="addNewAdminBtn">إنشاء مشرف جديد</button>
-                            <h4 style="font-size:0.9rem; color:#86198f; margin-top:10px;">المشرفون المسجلون:</h4>
-                            <div id="adminSubAdminsTable" style="max-height: 180px; overflow-y: auto;"></div>
-                        </div>
-
-                        <div style="background: #fff5f5; padding: 15px; border-radius: 10px; margin-top: 15px; border: 2px dashed #feb2b2;">
-                            <h3 style="color: #c53030; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-triangle-exclamation"></i> صيانة: تصفير التطبيق بالكامل</h3>
-                            <button class="btn btn-danger" id="factoryResetBtn">تصفير وإعادة ضبط النظام بالكامل</button>
-                        </div>
-                    </div>
-
-                    <div id="adminSec_logs" class="admin-sub-section" style="margin-top: 15px; display: none;">
-                        <div style="background: #fafaf9; padding: 15px; border-radius: 10px; border: 1px solid #e7e5e4;">
-                            <h3 style="color: #44403c; margin-bottom: 8px; font-size: 1rem;"><i class="fa-solid fa-clock-rotate-left"></i> السجل التاريخي للعمليات</h3>
-                            <div id="adminSystemLogTable" style="max-height: 300px; overflow-y: auto;"></div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
         </div>
-        <footer>
-            <p>التطبيق المحلي وامن | جميع الحقوق محفوظة © 2026 - وصلني الشاطئ | للاستفسار والشحن واتساب: <a href="https://wa.me/218913368086" target="_blank" style="color:var(--primary); font-weight:bold;">0913368086</a></p>
-        </footer>
     </div>
 
+    <div class="container">
+        <div id="departmentPage" class="page-content">
+            <a class="back-btn" onclick="showMainHome()">← العودة للرئيسية</a>
+            <h2 id="deptTitle">عنوان القسم</h2>
+            <p id="deptDesc" style="margin-bottom: 20px; color: #555; line-height: 1.6;"></p>
+            <h3>المقررات الدراسية المعتمدة:</h3>
+            <table>
+                <thead><tr><th>م</th><th>رقم المقرر</th><th>اسم المقرر الدراسي</th></tr></thead>
+                <tbody id="coursesTableBody"></tbody>
+            </table>
+        </div>
+
+        <div id="dynamicPage" class="page-content">
+            <a class="back-btn" onclick="showMainHome()">← العودة للرئيسية</a>
+            <h2 id="dynTitle">العنوان</h2>
+            <div id="dynBody" style="line-height: 1.8; color: #445;"></div>
+        </div>
+
+        <!-- صفحة الأخبار العامة -->
+        <div id="newsPage" class="page-content" style="display:none;">
+            <a class="back-btn" onclick="showMainHome()">← العودة للرئيسية</a>
+            <h2>أخبار جامعة المنارة العلمية الأهلية</h2>
+            <div id="newsListContainer" style="margin-top:20px;"></div>
+        </div>
+
+        <div id="portalLoginWrapper" class="page-content" style="display:none;">
+            <a class="back-btn" onclick="showMainHome()">← العودة للرئيسية</a>
+            <div class="login-box">
+                <h3 id="loginTitleModal">تسجيل الدخول للبوابة</h3>
+                <p id="loginHint" style="font-size:13px; color:#666; margin-bottom:15px;"></p>
+                <div class="form-group"><label id="lblUser">اسم المستخدم / رقم القيد:</label><input type="text" id="portalUser" placeholder="أدخل البيانات"></div>
+                <div class="form-group"><label id="lblPass">كلمة المرور:</label><input type="password" id="portalPass" placeholder="أدخل كلمة المرور"></div>
+                <button class="btn-main" onclick="verifyPortalLogin()">تسجيل الدخول</button>
+            </div>
+        </div>
+
+        <!-- بوابة الطلبة -->
+        <div id="studentPage" class="page-content" style="display:none;">
+            <a class="back-btn" onclick="showMainHome()">← تسجيل الخروج</a>
+            <div id="studentHeaderProfile" style="background:#f8f9fa; padding:20px; border-radius:6px; border:1px solid #ddd; margin-bottom:20px;"></div>
+            <div style="background:#fff; padding:20px; border:1px solid #ddd; border-radius:6px;">
+                <h3 style="color:#0b2545; margin-bottom:10px;">الاستعلام عن النتيجة الدراسية</h3>
+                <p style="font-size:13px; color:#666; margin-bottom:15px;">انقر على الزر أدناه لعرض نتيجتك (يتطلب سداد الرسوم أو الموافقة على الأقساط):</p>
+                <button class="btn-main" style="width:auto; margin-bottom:15px;" onclick="checkStudentLoggedInRecord()">عرض النتيجة والسجل الدراسي</button>
+                <div id="studentLoggedInResultDisplay"></div>
+            </div>
+        </div>
+
+        <!-- بوابة الموظفين -->
+        <div id="employeePage" class="page-content" style="display:none;">
+            <a class="back-btn" onclick="showMainHome()">← تسجيل الخروج</a>
+            <h2 id="empWelcomeTitle">بوابة الموظفين - تسجيل الطلاب والرسوم ونظام الأقساط</h2>
+            <div style="max-width: 600px; margin-bottom:30px;">
+                <h3 style="color:#0b2545; margin-bottom:15px; font-size:16px;">إضافة طالب جديد (تلقائي الحساب):</h3>
+                <div class="form-group"><label>اسم الطالب الكامل:</label><input type="text" id="empStName" placeholder="اسم الطالب"></div>
+                <div class="form-group"><label>رقم القيد:</label><input type="text" id="empStID" placeholder="رقم القيد"></div>
+                <div class="form-group"><label>تاريخ الميلاد (كلمة المرور الافتراضية):</label><input type="date" id="empStDOB" value="2005-01-01"></div>
+                <div class="form-group"><label>القسم:</label>
+                    <select id="empStDept">
+                        <option value="business">كلية الإدارة والأعمال</option>
+                        <option value="accounting">كلية المحاسبة</option>
+                        <option value="law">كلية القانون</option>
+                        <option value="it">قسم تقنية المعلومات</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>المجموعة الدراسية (الشعبة):</label><input type="text" id="empStGroup" placeholder="مثال: مجموعة أ (صباحي)"></div>
+                <div class="form-group"><label>قيمة الرسوم المطلوبة (د.ل):</label><input type="number" id="empStFee" placeholder="مثال: 500"></div>
+                <button class="btn-main" onclick="employeeRegisterStudent()">حفظ وتفعيل الطالب بالمنظومة</button>
+            </div>
+
+            <div style="max-width: 600px; background:#f8f9fa; padding:20px; border-radius:6px; border:1px solid #ddd; margin-bottom:30px;">
+                <h3 style="color:#0b2545; margin-bottom:15px; font-size:16px;">إدارة السداد والرسوم والأقساط:</h3>
+                <div class="form-group"><label>رقم قيد الطالب:</label><input type="text" id="payStID" placeholder="رقم القيد"></div>
+                <div class="form-group"><label>حالة السداد:</label>
+                    <select id="payStatus">
+                        <option value="paid">مسدد بالكامل</option>
+                        <option value="unpaid">غير مسدد</option>
+                        <option value="installment">نظام أقساط</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>موافقة الإدارة على الأقساط:</label>
+                    <select id="payInstallmentApproval">
+                        <option value="no">غير معتمد</option>
+                        <option value="yes">موافق عليه ومفعل</option>
+                    </select>
+                </div>
+                <button class="btn-main" onclick="updatePaymentStatus()">حفظ التعديلات المالية</button>
+            </div>
+        </div>
+
+        <!-- بوابة أعضاء هيئة التدريس -->
+        <div id="facultyPage" class="page-content" style="display:none;">
+            <a class="back-btn" onclick="showMainHome()">← تسجيل الخروج</a>
+            <h2 id="facultyDashboardTitle">بوابة أعضاء هيئة التدريس - رصد الدرجات</h2>
+            <div style="max-width: 700px; background:#f8f9fa; padding:20px; border-radius:6px; border:1px solid #ddd; margin-bottom:20px;">
+                <div class="form-group"><label>المقرر الدراسي:</label>
+                    <select id="facSubjectSelect" onchange="populateGroupsForSubject()">
+                        <!-- تعبئة تلقائية -->
+                    </select>
+                </div>
+                <div class="form-group"><label>المجموعة الدراسية (الشعبة المرتبطة مع الأستاذ):</label>
+                    <select id="facGroupSelect" onchange="loadStudentsForGroupAndSubject()">
+                        <!-- تعبئة تلقائية للمجموعة -->
+                    </select>
+                </div>
+                <div class="form-group"><label>رقم قيد وطالب المجموعة (يظهر تلقائياً):</label>
+                    <select id="facStIDSelect">
+                        <!-- تعبئة تلقائية -->
+                    </select>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                    <div class="form-group"><label>أعمال السنة (من 40):</label><input type="number" id="facCourseWork" placeholder="مثال: 35"></div>
+                    <div class="form-group"><label>الامتحان النهائي (من 60):</label><input type="number" id="facFinalExam" placeholder="مثال: 50"></div>
+                </div>
+                <button class="btn-main" onclick="saveDetailedGrade()">حساب ورصد الدرجة في السجل</button>
+            </div>
+        </div>
+
+        <!-- بوابة الإدارة -->
+        <div id="adminPage" class="page-content" style="display:none;">
+            <a class="back-btn" onclick="showMainHome()">← تسجيل الخروج</a>
+            <h2>بوابة الإدارة - لوحة التحكم والتحكم الشامل</h2>
+            
+            <!-- إضافة مقرر جديد -->
+            <div style="background:#fdfdfd; padding:20px; border-radius:6px; margin-bottom:30px; border:1px solid #cbd5e1;">
+                <h3 style="color:#0b2545; margin-bottom:12px; font-size:17px;">📚 إضافة مقرر دراسي جديد:</h3>
+                <div class="form-group"><label>القسم / الكلية:</label>
+                    <select id="adminNewCourseDept">
+                        <option value="business">كلية الإدارة والأعمال</option>
+                        <option value="accounting">كلية المحاسبة</option>
+                        <option value="law">كلية القانون</option>
+                        <option value="it">قسم تقنية المعلومات</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>رقم الكود (مثال: ACC 201):</label><input type="text" id="adminNewCourseCode" placeholder="رقم المقرر"></div>
+                <div class="form-group"><label>اسم المقرر الدراسي:</label><input type="text" id="adminNewCourseName" placeholder="اسم المقرر"></div>
+                <button class="btn-main" onclick="adminAddNewCourse()">إضافة المقرر للقسم وتحديث البوابة</button>
+            </div>
+
+            <!-- نشر الأخبار -->
+            <div style="background:#fdfdfd; padding:20px; border-radius:6px; margin-bottom:30px; border:1px solid #cbd5e1;">
+                <h3 style="color:#0b2545; margin-bottom:12px; font-size:17px;">📢 نشر خبر جديد في الشريط والشاشة:</h3>
+                <div class="form-group"><label>عنوان الخبر:</label><input type="text" id="adminNewsTitle" placeholder="عنوان الخبر"></div>
+                <div class="form-group"><label>محتوى الخبر التفصيلي:</label><textarea id="adminNewsBody" rows="3" placeholder="تفاصيل الخبر..."></textarea></div>
+                <button class="btn-main" onclick="adminPublishNews()">نشر الخبر رسمياً</button>
+            </div>
+
+            <!-- تعديل بند/بيانات عامة أو حذف طالب -->
+            <div style="background:#fdfdfd; padding:20px; border-radius:6px; margin-bottom:30px; border:1px solid #cbd5e1;">
+                <h3 style="color:#0b2545; margin-bottom:12px; font-size:17px;">🛠 إدارة وحذف بيانات الطلاب:</h3>
+                <div class="form-group"><label>رقم قيد الطالب المراد حذفه أو مراجعته:</label><input type="text" id="adminTargetStID" placeholder="رقم القيد"></div>
+                <button class="btn-main" style="background:#dc2626;" onclick="adminDeleteStudent()">حذف الطالب من المنظومة</button>
+            </div>
+
+            <h3 style="color:#0b2545; margin-bottom:10px;">📋 السجل التاريخي لحركات وإدخالات وتعديلات الموظفين (Audit Trail):</h3>
+            <table>
+                <thead>
+                    <tr><th>م</th><th>اسم الموظف</th><th>نوع الإجراء</th><th>وصف الحركة / التعديل</th><th>التاريخ والوقت</th></tr>
+                </thead>
+                <tbody id="auditLogsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="bottom-ticker">
+        <div class="ticker-content">
+            <span class="ticker-badge">آخر الأخبار</span>
+            <div id="tickerText">بداية التسجيل في الفصل الدراسي الجديد للعام الجامعي 2026 - 2027</div>
+        </div>
+        <div>📞 تواصل معنا</div>
+    </div>
+
+    <footer>
+        <p>جامعة معتمدة تخضع لإشراف التعليم العالي والبحث العلمي</p>
+        <p style="margin-top: 8px; font-size: 13px; color: #cbd5e1;">جميع الحقوق محفوظة © 2026 - جامعة المنارة العلمية الأهلية</p>
+        <button class="hidden-admin-trigger" onclick="openPortal('admin')">تسجيل دخول الإدارة (لوحة التحكم الشاملة)</button>
+    </footer>
+
     <script>
-        const firebaseConfig = { databaseURL: "https://waselni-shatea-default-rtdb.firebaseio.com/" };
-        if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-        const db = firebase.database();
-
-        let currentClientPhone = null;
-        let currentDriverPhone = null;
-        let currentDriverGender = 'ذكر';
-        let globalRoutesPricing = {};
-        let lastKnownOrderCount = 0;
-
-        let browserInstanceId = localStorage.getItem('waselni_browser_uid');
-        if(!browserInstanceId) {
-            browserInstanceId = 'uid_' + Math.random().toString(36).substring(2) + Date.now();
-            localStorage.setItem('waselni_browser_uid', browserInstanceId);
-        }
-
-        function switchAdminSection(secName) {
-            document.querySelectorAll('.admin-sub-section').forEach(s => s.style.display = 'none');
-            document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
-            
-            const targetSec = document.getElementById('adminSec_' + secName);
-            if(targetSec) targetSec.style.display = 'block';
-            
-            event.currentTarget.classList.add('active');
-        }
-
-        document.getElementById('adminLogoutBtn')?.addEventListener('click', () => {
-            document.getElementById('adminContentPanel').style.display = 'none';
-            document.getElementById('adminLoginBox').style.display = 'block';
-            document.getElementById('adminUsernameInput').value = '';
-            document.getElementById('adminPinInput').value = '';
-        });
-
-        function playBeepSoundAndNotify(orderTitle) {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.4);
-            } catch(e) { console.log(e); }
-        }
-
-        function logAdminAction(actionText) {
-            let timeStr = new Date().toLocaleString('ar-LY');
-            db.ref('system_logs').push({ text: actionText, time: timeStr });
-        }
-
-        function addRevenue(amount, description) {
-            db.ref('system_revenues').transaction(current => (current || 0) + amount);
-            let timeStr = new Date().toLocaleString('ar-LY');
-            db.ref('revenue_transactions').push({ amount: amount, description: description, time: timeStr });
-            logAdminAction(`إيراد مضاف: ${amount} د.ل (${description})`);
-        }
-
-        db.ref(".info/connected").on("value", (snap) => {
-            const dot = document.getElementById("connectionDot");
-            const text = document.getElementById("connectionText");
-            if (snap.val() === true) {
-                dot.classList.add("connected");
-                text.innerText = "متصل بالسحابة";
-            } else {
-                dot.classList.remove("connected");
-                text.innerText = "جاري الاتصال...";
+        let departmentsData = JSON.parse(localStorage.getItem('mna_departments')) || {
+            business: {
+                title: "كلية الإدارة والأعمال",
+                desc: "المقررات المعتمدة لقسم الإدارة والأعمال.",
+                courses: [{code: "MAN 120", name: "مبادئ إدارة الأعمال"}, {code: "ECO 110", name: "الاقتصاد الجزئي"}]
+            },
+            accounting: {
+                title: "كلية المحاسبة",
+                desc: "المقررات المعتمدة لقسم المحاسبة.",
+                courses: [{code: "ACC 130", name: "مبادئ المحاسبة (1)"}, {code: "ACC 438", name: "المراجعة وتدقيق الحسابات"}]
+            },
+            law: {
+                title: "كلية القانون",
+                desc: "المقررات المعتمدة لقسم القانون.",
+                courses: [{code: "LAW 101", name: "مدخل لعلوم القانون"}, {code: "LAW 103", name: "القانون الدستوري"}]
+            },
+            it: {
+                title: "قسم تقنية المعلومات",
+                desc: "المقررات المعتمدة لقسم تقنية المعلومات.",
+                courses: [{code: "IT 101", name: "مقدمة في تقنية المعلومات"}, {code: "WEB 301", name: "تطوير وبناء مواقع الويب"}]
             }
-        });
+        };
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.sidebar-menu li').forEach(b => b.classList.remove('active'));
-            const targetCard = document.getElementById(tabId);
-            if(targetCard) targetCard.classList.add('active');
-            document.querySelectorAll('.sidebar-menu li').forEach(li => {
-                if(li.getAttribute('data-tab') === tabId) li.classList.add('active');
-            });
+        let newsList = JSON.parse(localStorage.getItem('mna_news')) || [
+            { title: "بداية التسجيل للفصل الدراسي الجديد", body: "تم فتح باب التسجيل والقبول للعام الجامعي 2026 - 2027 بكافة الأقسام.", date: "2026-10-01" }
+        ];
+
+        let facultyAccounts = {
+            "prof_acc": { name: "د. سالم المحاسبي", dept: "accounting", subjects: ["مبادئ المحاسبة (1)", "المراجعة وتدقيق الحسابات"] },
+            "prof_it": { name: "د. حامد البرمجي", dept: "it", subjects: ["مقدمة في تقنية المعلومات", "تطوير وبناء مواقع الويب"] },
+            "prof_biz": { name: "د. مريم الإدارية", dept: "business", subjects: ["مبادئ إدارة الأعمال", "الاقتصاد الجزئي"] },
+            "prof_law": { name: "د. خالد القانوني", dept: "law", subjects: ["مدخل لعلوم القانون", "القانون الدستوري"] }
+        };
+
+        let dbStudents = JSON.parse(localStorage.getItem('mna_students')) || [
+            { name: 'محمد أحمد', stID: '2026101', dob: '2005-05-12', dept: 'accounting', group: 'المجموعة أ (صباحي)', fee: 500, paidStatus: 'paid', installmentApproved: 'no', grades: [] }
+        ];
+
+        let auditLogs = JSON.parse(localStorage.getItem('mna_audit_logs')) || [
+            { employee: "admin", action: "بدء النظام", details: "تم تشغيل النظام الأكاديمي بنجاح", time: "2026-10-01 10:00" }
+        ];
+
+        let currentActivePortal = '';
+        let loggedInStudent = null;
+        let loggedInEmployee = null;
+        let loggedInFacultyKey = null;
+
+        function saveData() { 
+            localStorage.setItem('mna_students', JSON.stringify(dbStudents));
+            localStorage.setItem('mna_audit_logs', JSON.stringify(auditLogs));
+            localStorage.setItem('mna_departments', JSON.stringify(departmentsData));
+            localStorage.setItem('mna_news', JSON.stringify(newsList));
+            updateTickerDisplay();
         }
 
-        document.querySelectorAll('.sidebar-menu li').forEach(li => {
-            li.addEventListener('click', function() {
-                const tab = this.getAttribute('data-tab');
-                if(tab) switchTab(tab);
-            });
-        });
-
-        document.getElementById('adminSecretTrigger').addEventListener('dblclick', () => switchTab('adminTab'));
-        document.getElementById('adminSecretTrigger').addEventListener('click', e => e.preventDefault());
-
-        function loadRegions() {
-            db.ref('regions').on('value', snap => {
-                let customRegions = snap.val();
-                let defaultRegions = ["تامزاوة", "تمسان", "براك المركز", "إدري", "القرضة", "المنصورة", "المحروقة", "تاروت", "قيرة", "برقن"];
-                if(customRegions) {
-                    Object.keys(customRegions).forEach(k => {
-                        if(!defaultRegions.includes(customRegions[k])) defaultRegions.push(customRegions[k]);
-                    });
-                }
-                const pickupSel = document.getElementById('pickupLocation');
-                const dropoffSel = document.getElementById('dropoffLocation');
-                const pricingPickup = document.getElementById('pricingPickup');
-                const pricingDropoff = document.getElementById('pricingDropoff');
-                
-                [pickupSel, dropoffSel, pricingPickup, pricingDropoff].forEach(sel => {
-                    if(sel) {
-                        sel.innerHTML = '';
-                        defaultRegions.forEach(reg => {
-                            sel.innerHTML += `<option value="${reg}">${reg}</option>`;
-                        });
-                    }
-                });
-            });
+        function logAction(empName, action, details) {
+            let now = new Date().toISOString().slice(0,16).replace('T', ' ');
+            auditLogs.push({ employee: empName, action, details, time: now });
+            saveData();
         }
-        loadRegions();
 
-        // تحميل الملفات العامة المنشورة ليراها العامة في الشريط
-        db.ref('public_files').on('value', snap => {
-            const bar = document.getElementById('publicDownloadsBar');
-            const adminTable = document.getElementById('adminPublicFilesTable');
-            const data = snap.val();
-            if(!bar) return;
-            bar.innerHTML = '';
-            if(adminTable) adminTable.innerHTML = '';
-
-            if(!data) {
-                bar.innerHTML = '<span style="font-size: 0.85rem;">لا توجد ملفات مرفوعة حالياً. التطبيق المحلي وامن.</span>';
-                if(adminTable) adminTable.innerHTML = '<p style="font-size:0.85rem;">لا توجد ملفات مرفوعة.</p>';
-                return;
+        function updateTickerDisplay() {
+            if(newsList.length > 0) {
+                document.getElementById('tickerText').innerText = newsList[newsList.length - 1].title + " - " + newsList[newsList.length - 1].body;
             }
+        }
+        updateTickerDisplay();
 
-            let adminHtml = '<table class="data-table"><tr><th>العنوان</th><th>الإجراء</th></tr>';
-            Object.keys(data).forEach(k => {
-                let file = data[k];
-                bar.innerHTML += `<a href="${file.fileUrl}" target="_blank" download="${file.title}" class="btn" style="padding: 6px 12px; font-size: 0.8rem; background: #047857; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;"><i class="fa-solid fa-download"></i> ${file.title}</a>`;
-                adminHtml += `<tr><td>${file.title}</td><td><button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="deletePublicFile('${k}')">حذف</button></td></tr>`;
-            });
-            if(adminTable) adminTable.innerHTML = adminHtml + '</table>';
-        });
-
-        document.getElementById('uploadPublicFileBtn').addEventListener('click', () => {
-            const title = document.getElementById('uploadFileTitle').value.trim();
-            const fileInput = document.getElementById('uploadFileInput');
-            if(!title || !fileInput.files || !fileInput.files[0]) {
-                alert('أدخل عنوان الملف واختبر الملف المراد رفعه.');
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                let base64File = e.target.result;
-                db.ref('public_files').push({ title: title, fileUrl: base64File, time: new Date().toLocaleString('ar-LY') }).then(() => {
-                    alert('✅ تم رفع ونشر الملف بنجاح للعامة.');
-                    document.getElementById('uploadFileTitle').value = '';
-                    document.getElementById('uploadFileInput').value = '';
-                    logAdminAction(`رفع ملف عام: ${title}`);
-                });
+        function openPortal(portalType) {
+            currentActivePortal = portalType;
+            let titles = {
+                'student': 'تسجيل الدخول - بوابة الطلبة',
+                'employee': 'تسجيل الدخول - بوابة الموظفين',
+                'faculty': 'تسجيل الدخول - بوابة أعضاء هيئة التدريس',
+                'admin': 'تسجيل الدخول - لوحة تحكم الإدارة الشاملة'
             };
-            reader.readAsDataURL(fileInput.files[0]);
-        });
-
-        window.deletePublicFile = (key) => {
-            if(confirm('هل أنت متأكد من حذف هذا الملف من العرض العام؟')) {
-                db.ref('public_files/' + key).remove().then(() => logAdminAction(`حذف ملف عام`));
-            }
-        };
-
-        document.getElementById('addNewRegionBtn').addEventListener('click', () => {
-            const regName = document.getElementById('newRegionInput').value.trim();
-            if(!regName) { alert('أدخل اسم المنطقة.'); return; }
-            db.ref('regions').push(regName).then(() => {
-                alert(`✅ تم إضافة منطقة (${regName}) بنجاح.`);
-                document.getElementById('newRegionInput').value = '';
-                logAdminAction(`إضافة منطقة جديدة: ${regName}`);
-            });
-        });
-
-        // تحديث الرقم السري للوحة الإدارة
-        document.getElementById('updateAdminPinBtn').addEventListener('click', () => {
-            const newPin = document.getElementById('newAdminPinPass').value.trim();
-            if(!newPin) { alert('أدخل كلمة المرور الجديدة.'); return; }
-            db.ref('admin_settings/custom_pin').set(newPin).then(() => {
-                alert('✅ تم تحديث الرقم السري للإدارة بنجاح.');
-                document.getElementById('newAdminPinPass').value = '';
-                logAdminAction('تحديث كلمة مرور لوحة الإدارة');
-            });
-        });
-
-        document.getElementById('addNewAdminBtn').addEventListener('click', () => {
-            const user = document.getElementById('newAdminUser').value.trim();
-            const pass = document.getElementById('newAdminPass').value.trim();
-            if(!user || !pass) { alert('أدخل اسم المستخدم وكلمة المرور.'); return; }
-
-            db.ref('sub_admins/' + user).set({ pass }).then(() => {
-                alert(`✅ تم إنشاء حساب المشرف الفرعي (${user}) بنجاح.`);
-                document.getElementById('newAdminUser').value = '';
-                document.getElementById('newAdminPass').value = '';
-                logAdminAction(`إضافة مشرف إداري جديد: ${user}`);
-            });
-        });
-
-        window.deleteSubAdmin = (username) => {
-            if(confirm(`هل أنت متأكد من حذف المشرف (${username})؟`)) {
-                db.ref('sub_admins/' + username).remove().then(() => {
-                    alert('✅ تم حذف المشرف بنجاح.');
-                    logAdminAction(`حذف المشرف الإداري: ${username}`);
-                });
-            }
-        };
-
-        db.ref('route_prices').on('value', snap => {
-            globalRoutesPricing = snap.val() || {};
-            checkLocationPricing();
-            loadAdminPricingTable();
-        });
-
-        function checkLocationPricing() {
-            const pickup = document.getElementById('pickupLocation').value;
-            const dropoff = document.getElementById('dropoffLocation').value;
-            const finalField = document.getElementById('clientFinalCalculatedPrice');
-            const serviceType = document.getElementById('serviceType').value;
-
-            if (serviceType === 'طلب سيارة نقل') {
-                finalField.value = 'السعر بالاتفاق';
-                return;
-            }
-
-            let routeKey = `${pickup}_to_${dropoff}`;
-            if (globalRoutesPricing[routeKey]) {
-                finalField.value = globalRoutesPricing[routeKey].price + ' د.ل (محدد من الإدارة)';
-            } else if (pickup === dropoff) {
-                finalField.value = '10 د.ل (داخل المنطقة)';
-            } else {
-                finalField.value = '10 د.ل (افتراضي)';
-            }
-        }
-
-        document.getElementById('serviceType').addEventListener('change', () => {
-            toggleCargoField();
-            checkLocationPricing();
-        });
-
-        function toggleCargoField() {
-            const service = document.getElementById('serviceType').value;
-            document.getElementById('cargoDetailsGroup').style.display = (service === 'طلب سيارة نقل') ? 'block' : 'none';
-        }
-
-        function toggleAuthMode(portal, mode) {
-            const container = portal === 'client' ? document.getElementById('clientPortalTab') : document.getElementById('driverPortalTab');
-            const loginBox = container.querySelector(portal === 'client' ? '#clientLoginBox' : '#driverLoginBox');
-            const regBox = container.querySelector(portal === 'client' ? '#clientRegisterBox' : '#driverRegisterBox');
+            document.getElementById('loginTitleModal').innerText = titles[portalType];
             
-            const btns = container.querySelectorAll('.sub-btn');
-            btns.forEach(b => b.classList.remove('active'));
-            if(mode === 'login') {
-                loginBox.classList.add('active'); regBox.classList.remove('active'); btns[0].classList.add('active');
-            } else if(mode === 'register') {
-                regBox.classList.add('active'); loginBox.classList.remove('active'); btns[1].classList.add('active');
-            }
-        }
-
-        document.getElementById('clientLoginSwitchBtn').addEventListener('click', () => toggleAuthMode('client', 'login'));
-        document.getElementById('clientRegSwitchBtn').addEventListener('click', () => toggleAuthMode('client', 'register'));
-        document.getElementById('driverLoginSwitchBtn').addEventListener('click', () => toggleAuthMode('driver', 'login'));
-        document.getElementById('driverRegSwitchBtn').addEventListener('click', () => toggleAuthMode('driver', 'register'));
-
-        document.getElementById('submitRechargeBtn').addEventListener('click', () => {
-            const code = document.getElementById('rechargeCardCode').value.trim();
-            if(!code) { alert('أدخل كود الكرت.'); return; }
-            if(!currentClientPhone) { alert('يجب تسجيل الدخول أولاً.'); return; }
-
-            db.ref('cards/' + code).once('value').then(snap => {
-                if(!snap.val()) { alert('كود الكرت غير صحيح.'); return; }
-                let cardData = snap.val();
-                if(cardData.used) { alert('⚠ هذا الكرت مستخدم مسبقاً.'); return; }
-
-                let now = Date.now();
-                let thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-                if(cardData.createdAt && (now - cardData.createdAt > thirtyDaysMs)) {
-                    alert('❌ عذراً، انتهت صلاحية هذا الكرت.');
-                    return;
-                }
-
-                db.ref('clients/' + currentClientPhone).once('value').then(clientSnap => {
-                    if(!clientSnap.val()) { alert('حساب الزبون غير موجود.'); return; }
-                    let clientData = clientSnap.val();
-                    let newWallet = (clientData.wallet || 0) + cardData.value;
-                    let systemProfit = (cardData.value / 20) * 2;
-
-                    db.ref('clients/' + currentClientPhone).update({ wallet: newWallet });
-                    db.ref('cards/' + code).update({ used: true, usedBy: currentClientPhone });
-                    addRevenue(systemProfit, `شحن كرت زبون بقيمة ${cardData.value} د.ل`);
-
-                    alert(`🎉 تم شحن رصيدك بنجاح بقيمة ${cardData.value} د.ل! يمكنك الآن طلب الرحلات بشكل طبيعي.`);
-                    document.getElementById('rechargeCardCode').value = '';
-                    document.getElementById('clientWalletDisplay').innerText = newWallet;
-                });
-            });
-        });
-
-        document.getElementById('driverSubmitRechargeBtn').addEventListener('click', () => {
-            const code = document.getElementById('driverRechargeCardCode').value.trim();
-            if(!code) { alert('أدخل كود الكرت.'); return; }
-            if(!currentDriverPhone) { alert('يجب تسجيل دخول الكابتن أولاً.'); return; }
-
-            db.ref('cards/' + code).once('value').then(snap => {
-                if(!snap.val()) { alert('كود الكرت غير صحيح.'); return; }
-                let cardData = snap.val();
-                if(cardData.used) { alert('⚠ هذا الكرت مستخدم مسبقاً.'); return; }
-
-                let now = Date.now();
-                let thirtyDaysMs = 30 * 24 * 60 * 60 * 1000;
-                if(cardData.createdAt && (now - cardData.createdAt > thirtyDaysMs)) {
-                    alert('❌ عذراً، انتهت صلاحية هذا الكرت.');
-                    return;
-                }
-
-                db.ref('drivers/' + currentDriverPhone).once('value').then(driverSnap => {
-                    if(!driverSnap.val()) { alert('حساب السائق غير موجود.'); return; }
-                    let driverData = driverSnap.val();
-                    
-                    let netAddedValue = cardData.value - 1;
-                    let newWallet = (driverData.wallet || 0) + netAddedValue;
-                    let statement = driverData.statement || [];
-                    let timeStr = new Date().toLocaleString('ar-LY');
-
-                    statement.push({ time: timeStr, text: `شحن كرت بقيمة ${cardData.value} د.ل (خصم 1 د.ل رسوم، الصافي ${netAddedValue} د.ل)` });
-
-                    db.ref('drivers/' + currentDriverPhone).update({ wallet: newWallet, statement: statement });
-                    db.ref('cards/' + code).update({ used: true, usedBy: currentDriverPhone });
-                    
-                    let systemProfit = 1 + ((cardData.value / 20) * 2);
-                    addRevenue(systemProfit, `شحن كرت لسائق ${currentDriverPhone} بقيمة ${cardData.value} د.ل (مع خصم 1 د.ل رسوم)`);
-
-                    alert(`🎉 تم تفعيل الكرت بنجاح! تم إضافة صافي الرصيد (${netAddedValue} د.ل) بعد خصم 1 دينار رسوم.`);
-                    document.getElementById('driverRechargeCardCode').value = '';
-                    document.getElementById('driverWalletBalance').innerText = newWallet;
-                });
-            });
-        });
-
-        document.getElementById('submitTransferBtn').addEventListener('click', () => {
-            if(!currentClientPhone) { alert('يجب تسجيل دخول الزبون أولاً.'); return; }
-            const driverPhone = document.getElementById('transferDriverPhone').value.trim();
-            const amount = parseFloat(document.getElementById('transferAmount').value);
-
-            if(!driverPhone || isNaN(amount) || amount <= 0) {
-                alert('أدخل رقم هاتف سائق صحيح والمبلغ المراد تحويله.');
-                return;
-            }
-
-            db.ref('clients/' + currentClientPhone).once('value').then(cSnap => {
-                if(!cSnap.val()) { alert('حساب الزبون غير موجود.'); return; }
-                let clientData = cSnap.val();
-                let clientWallet = clientData.wallet || 0;
-
-                if(clientWallet < amount) {
-                    alert(`❌ عذراً، رصيد محفظتك الحالي (${clientWallet} د.ل) لا يكفي لإتمام عملية التحويل.`);
-                    return;
-                }
-
-                db.ref('drivers/' + driverPhone).once('value').then(dSnap => {
-                    if(!dSnap.val()) {
-                        alert('❌ رقم هاتف السائق غير مسجل أو غير موجود في النظام.');
-                        return;
-                    }
-                    let driverData = dSnap.val();
-                    let driverWallet = driverData.wallet || 0;
-                    let statement = driverData.statement || [];
-                    let timeStr = new Date().toLocaleString('ar-LY');
-
-                    let newClientWallet = clientWallet - amount;
-                    let newDriverWallet = driverWallet + amount;
-
-                    statement.push({ time: timeStr, text: `استلام تحويل مبلغ ${amount} د.ل من الزبون (${currentClientPhone})` });
-
-                    db.ref('clients/' + currentClientPhone).update({ wallet: newClientWallet });
-                    db.ref('drivers/' + driverPhone).update({ wallet: newDriverWallet, statement: statement });
-
-                    logAdminAction(`تحويل رصيد من الزبون ${currentClientPhone} إلى السائق ${driverPhone} بقيمة ${amount} د.ل`);
-
-                    alert(`✅ تم تحويل مبلغ ${amount} د.ل بنجاح إلى محفظة الكابتن ${driverData.fullName}!`);
-                    document.getElementById('transferDriverPhone').value = '';
-                    document.getElementById('transferAmount').value = '';
-                    document.getElementById('clientWalletDisplay').innerText = newClientWallet;
-                });
-            });
-        });
-
-        document.getElementById('clientRegBtn').addEventListener('click', () => {
-            const name = document.getElementById('clientRegName').value.trim();
-            const phone = document.getElementById('clientRegPhone').value.trim();
-            const pin = document.getElementById('clientRegPin').value.trim();
-            const idNumber = document.getElementById('clientRegIdNumber').value.trim();
-            const idPlace = document.getElementById('clientRegIdPlace').value.trim();
-            const idDate = document.getElementById('clientRegIdDate').value;
-            const legalChecked = document.getElementById('clientLegalCheck').checked;
-
-            if(!name || !phone || !pin || !idNumber || !idPlace || !idDate) { alert('أدخل كافة البيانات المطلوبة.'); return; }
-            if(!legalChecked) { alert('يجب الموافقة على التعهد القانوني للمتابعة.'); return; }
-
-            db.ref('pending_registrations/clients/' + phone).set({
-                name, pin, idNumber, idPlace, idDate, type: 'زبون', wallet: 0, completedTrips: 0, timestamp: Date.now()
-            }).then(() => {
-                alert('✅ تم إرسال طلب تسجيل الزبون بنجاح وهو بانتظار موافقة الإدارة.');
-                toggleAuthMode('client', 'login');
-            });
-        });
-
-        document.getElementById('clientLoginBtn').addEventListener('click', () => {
-            const phone = document.getElementById('clientLoginPhone').value.trim();
-            const pin = document.getElementById('clientLoginPin').value.trim();
-            db.ref('clients/' + phone).once('value').then(snap => {
-                if(!snap.val() || snap.val().pin !== pin) { alert('خطأ في البيانات أو أن الحساب غير معتمد من الإدارة بعد.'); return; }
-                
-                let clientData = snap.val();
-                let activeDevice = clientData.activeDevice || '';
-                
-                if(activeDevice && activeDevice !== browserInstanceId) {
-                    alert('❌ عذراً، هذا الحساب مسجل ومفتوح حالياً على جهاز أو متصفح آخر. التطبيق المحلي وامن ويمنع فتح الحساب من عدة متصفحات.');
-                    return;
-                }
-
-                db.ref('clients/' + phone + '/activeDevice').set(browserInstanceId);
-                currentClientPhone = phone;
-                loadClientDashboard(clientData);
-            });
-        });
-
-        function loadClientDashboard(data) {
-            document.getElementById('clientLoginBox').style.display = 'none';
-            document.getElementById('clientRegisterBox').style.display = 'none';
-            document.getElementById('clientAuthSwitchBtns').style.display = 'none';
-            document.getElementById('clientDashboardArea').style.display = 'block';
-            document.getElementById('clientOrdersWrapper').style.display = 'block';
-            document.getElementById('clientWelcomeName').innerText = data.name;
-            document.getElementById('clientWalletDisplay').innerText = data.wallet || 0;
-            document.getElementById('clientTripsCount').innerText = data.completedTrips || 0;
-            loadClientActiveOrders();
-        }
-
-        document.getElementById('clientLogoutBtn2').addEventListener('click', () => {
-            if(currentClientPhone) {
-                db.ref('clients/' + currentClientPhone + '/activeDevice').remove();
-            }
-            currentClientPhone = null;
-            document.getElementById('clientDashboardArea').style.display = 'none';
-            document.getElementById('clientOrdersWrapper').style.display = 'none';
-            document.getElementById('clientAuthSwitchBtns').style.display = 'flex';
-            toggleAuthMode('client', 'login');
-        });
-
-        document.getElementById('sendOrderBtn').addEventListener('click', () => {
-            if(!currentClientPhone) return;
-
-            db.ref('clients/' + currentClientPhone).once('value').then(cSnap => {
-                let clientData = cSnap.val();
-                let clientWallet = clientData.wallet || 0;
-
-                if(clientWallet <= -3) {
-                    alert(`❌ عذراً، رصيد محفظتك الحالي هو (${clientWallet} د.ل). لقد وصلت للحد الأدنى المسموح (-3 د.ل)، ولا يمكنك طلب رحلة جديدة إلا بعد شحن محفظتك بكرت مسبق الدفع.`);
-                    return;
-                }
-
-                const service = document.getElementById('serviceType').value;
-                const genderType = document.getElementById('clientGenderType').value;
-                const pickup = document.getElementById('pickupLocation').value;
-                const dropoff = document.getElementById('dropoffLocation').value;
-                const paymentMethod = document.getElementById('paymentMethod').value;
-                const cargoDetails = document.getElementById('cargoDetailsInput').value.trim();
-                
-                let routeKey = `${pickup}_to_${dropoff}`;
-                let price = (service === 'طلب سيارة نقل') ? 'بالاتفاق' : (globalRoutesPricing[routeKey] ? globalRoutesPricing[routeKey].price + ' د.ل' : '10 د.ل');
-
-                db.ref('orders').push({
-                    clientName: clientData.name,
-                    clientPhone: currentClientPhone,
-                    serviceType: service,
-                    genderType: genderType,
-                    pickupLocation: pickup,
-                    dropoffLocation: dropoff,
-                    price: price,
-                    paymentMethod: paymentMethod,
-                    cargoDetails: cargoDetails || 'لا توجد',
-                    status: 'قيد الانتظار',
-                    driverName: 'بانتظار القبول',
-                    timestamp: Date.now()
-                }).then(() => {
-                    addRevenue(1, `عمولة طلب رحلة من الزبون ${currentClientPhone}`);
-                    alert('🎉 تم إرسال طلبك بنجاح ووصل تلقائياً للسائقين المتاحين!');
-                });
-            });
-        });
-
-        function loadClientActiveOrders() {
-            db.ref('orders').orderByChild('clientPhone').equalTo(currentClientPhone).on('value', snap => {
-                const listDiv = document.getElementById('clientActiveOrdersList');
-                const data = snap.val();
-                listDiv.innerHTML = '';
-                if(!data) { listDiv.innerHTML = '<p>لا توجد طلبات نشطة.</p>'; return; }
-                Object.keys(data).forEach(k => {
-                    let ord = data[k];
-                    let orderHtml = `<div style="background:#f1f5f9; padding:10px; border-radius:8px; margin-bottom:8px;">` +
-                                    `<p><b>${ord.serviceType}</b> (${ord.genderType}) | ${ord.pickupLocation} ➔${ord.dropoffLocation}</p>` +
-                                    `<p>السعر: <b>${ord.price}</b> | الحالة: <b style="color:var(--primary);">${ord.status}</b></p>`;
-                    
-                    if(ord.status === 'مقبولة وتوصيل' && ord.driverPhone) {
-                        db.ref('drivers/' + ord.driverPhone + '/location').once('value').then(locSnap => {
-                            let locUrl = locSnap.val();
-                            if(locUrl) {
-                                orderHtml += `<a href="${locUrl}" target="_blank" class="btn btn-success" style="display:block; text-align:center; margin-top:6px; padding:5px; font-size:0.8rem; text-decoration:none;"><i class="fa-solid fa-map-location-dot"></i> تتبع موقع السائق الحي</a>`;
-                            }
-                        });
-                        orderHtml += `<button class="btn btn-success" style="margin-top:8px; padding:8px; font-size:0.85rem; background:#16a34a;" onclick="clientCompleteOrder('${k}', '${ord.driverPhone}')"><i class="fa-solid fa-circle-check"></i> تم التوصيل بنجاح</button>`;
-                    } else if(ord.status === 'مكتملة') {
-                        orderHtml += `<p style="color:green; font-weight:bold; margin-top:5px;"><i class="fa-solid fa-check-double"></i> تم إتمام التوصيل بنجاح</p>`;
-                    }
-                    orderHtml += `</div>`;
-                    listDiv.innerHTML += orderHtml;
-                });
-            });
-        }
-
-        window.clientCompleteOrder = (orderId, driverPhone) => {
-            if(!currentClientPhone) return;
-            if(!confirm('هل تؤكد وصول الطلب وإتمام التوصيل بنجاح؟')) return;
-
-            db.ref('orders/' + orderId).once('value').then(oSnap => {
-                let ord = oSnap.val();
-                if(ord.status === 'مكتملة') return;
-
-                db.ref('orders/' + orderId).update({ status: 'مكتملة' }).then(() => {
-                    let timeStr = new Date().toLocaleString('ar-LY');
-
-                    db.ref('clients/' + currentClientPhone).once('value').then(cSnap => {
-                        let cData = cSnap.val();
-                        let cWallet = (cData.wallet || 0) - 1;
-                        let cTrips = (cData.completedTrips || 0) + 1;
-                        db.ref('clients/' + currentClientPhone).update({ wallet: cWallet, completedTrips: cTrips });
-                        document.getElementById('clientWalletDisplay').innerText = cWallet;
-                        document.getElementById('clientTripsCount').innerText = cTrips;
-                        addRevenue(1, `خصم خدمات 1 د.ل عند تأكيد الزبون ${currentClientPhone} إتمام الرحلة`);
-                    });
-
-                    if(driverPhone) {
-                        db.ref('drivers/' + driverPhone).once('value').then(dSnap => {
-                            let dData = dSnap.val();
-                            if(!dData) return;
-                            let dWallet = (dData.wallet || 0) - 1;
-                            let dTrips = (dData.completedTrips || 0) + 1;
-                            let statement = dData.statement || [];
-                            let starBadge = dData.starBadge || false;
-
-                            statement.push({ time: timeStr, text: `إتمام الرحلة بنجاح وتأكيد الزبون (خصم 1 د.ل رسوم نظام)` });
-
-                            let bonusMsg = '';
-                            if(dTrips >= 30 && !starBadge) {
-                                starBadge = true;
-                                dWallet += 10;
-                                statement.push({ time: timeStr, text: `🎉 مبروك! إنجاز 30 رحلة بنجاح والحصول على نجمة (⭐) ورصيد مجاني تحفيزي.` });
-                                bonusMsg = ' وتهانينا! لقد حققت 30 رحلة وتم منحك نجمة تقديرية ورصيد مجاني في محفظتك!';
-                            }
-
-                            db.ref('drivers/' + driverPhone).update({
-                                wallet: dWallet,
-                                completedTrips: dTrips,
-                                statement: statement,
-                                starBadge: starBadge
-                            });
-
-                            addRevenue(1, `خصم عمولة 1 د.ل من السائق ${driverPhone} عند إتمام التوصيل`);
-
-                            if(currentDriverPhone === driverPhone) {
-                                document.getElementById('driverWalletBalance').innerText = dWallet;
-                                document.getElementById('driverTripsCount').innerText = dTrips;
-                                if(starBadge) {
-                                    document.getElementById('driverBadgeBox').innerHTML = '⭐ (الكابتن الحائز على النجمة لإنجازه 30 رحلة)';
-                                }
-                            }
-                            alert('✅ تم تأكيد إتمام التوصيل بنجاح! تم خصم 1 دينار من محفظتك وتحديث الأرصدة وإيرادات النظام.' + bonusMsg);
-                        });
-                    }
-                });
-            });
-        };
-
-        function readFileAsBase64(fileInputId, callback) {
-            const fileInput = document.getElementById(fileInputId);
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) { callback(e.target.result); };
-                reader.readAsDataURL(fileInput.files[0]);
-            } else {
-                callback(null);
-            }
-        }
-
-        window.openImageModal = (dataUrl, title) => {
-            if(!dataUrl) { alert('المستند غير متوفر.'); return; }
-            const win = window.open('', '_blank');
-            win.document.write(`
-                <html dir="rtl">
-                <head><title>معاينة مستند - ${title}</title></head>
-                <body style="background:#111; color:#fff; text-align:center; padding:20px; font-family:Cairo,sans-serif;">
-                    <h2>${title}</h2>
-                    <hr style="border-color:#444; margin:15px 0;">
-                    <img src="${dataUrl}" style="max-width:100%; height:auto; border-radius:8px; box-shadow:0 0 15px rgba(255,255,255,0.2);">
-                    <br><br>
-                    <button onclick="window.close()" style="padding:10px 20px; background:#dc3545; color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:bold;">إغلاق المعاينة</button>
-                </body>
-                </html>
-            `);
-        };
-
-        document.getElementById('driverRegBtn').addEventListener('click', () => {
-            const name = document.getElementById('driverRegName').value.trim();
-            const phone = document.getElementById('driverRegPhone').value.trim();
-            const car = document.getElementById('driverRegCar').value.trim();
-            const carPlate = document.getElementById('driverRegCarPlate').value.trim();
-            const gender = document.getElementById('driverRegGender').value;
-            const idNumber = document.getElementById('driverRegIdNumber').value.trim();
-            const idPlace = document.getElementById('driverRegIdPlace').value.trim();
-            const idDate = document.getElementById('driverRegIdDate').value;
-            const legalChecked = document.getElementById('driverLegalCheck').checked;
-
-            const carFile = document.getElementById('driverFileCar').files[0];
-            const passFile = document.getElementById('driverFilePassport').files[0];
-            const bookFile = document.getElementById('driverFileBook').files[0];
-
-            if(!name || !phone || !car || !carPlate || !idNumber || !idPlace || !idDate) {
-                alert('أرجو إدخال كافة البيانات الشخصية وبيانات المركبة المطلوبة.');
-                return;
-            }
-            if(!carFile || !passFile || !bookFile) {
-                alert('⚠️ عذراً، يجب رفع جميع المستندات المطلوبة (صورة السيارة، الهوية أو جواز السفر، وكتيب المركبة) لإتمام التسجيل وإرساله للإدارة.');
-                return;
-            }
-            if(!legalChecked) {
-                alert('يجب الموافقة على التعهد القانوني للمتابعة.');
-                return;
-            }
-
-            readFileAsBase64('driverFileCar', (carImg) => {
-                readFileAsBase64('driverFilePassport', (passImg) => {
-                    readFileAsBase64('driverFileBook', (bookImg) => {
-                        db.ref('pending_registrations/drivers/' + phone).set({
-                            fullName: name, whatsapp: phone, carType: car, carPlate: carPlate, gender: gender,
-                            idNumber, idPlace, idDate, carImg: carImg || '', passImg: passImg || '', bookImg: bookImg || '',
-                            type: 'سائق', wallet: 0, completedTrips: 0, statement: [], timestamp: Date.now()
-                        }).then(() => {
-                            alert('✅ تم رفع المستندات وحفظ نسخة منها للإدارة، وتم إرسال طلب انضمام الكابتن بنجاح وهو بانتظار الاعتماد.');
-                            toggleAuthMode('driver', 'login');
-                        }).catch(err => {
-                            alert('❌ حدث خطأ أثناء إرسال الطلب: ' + err.message);
-                        });
-                    });
-                });
-            });
-        });
-
-        document.getElementById('driverLoginBtn').addEventListener('click', () => {
-            const phone = document.getElementById('driverLoginPhone').value.trim();
-            db.ref('drivers/' + phone).once('value').then(snap => {
-                if(!snap.val()) { alert('رقم السائق غير مسجل أو لم يتم اعتماده من الإدارة بعد.'); return; }
-                
-                let driverData = snap.val();
-                let activeDevice = driverData.activeDevice || '';
-                
-                if(activeDevice && activeDevice !== browserInstanceId) {
-                    alert('❌ عذراً، حساب الكابتن مسجل ومفتوح حالياً على جهاز أو متصفح آخر. التطبيق المحلي وامن ويمنع فتح الحساب من عدة متصفحات.');
-                    return;
-                }
-
-                db.ref('drivers/' + phone + '/activeDevice').set(browserInstanceId);
-                currentDriverPhone = phone;
-                currentDriverGender = driverData.gender || 'ذكر';
-                loadDriverDashboard(driverData);
-            });
-        });
-
-        function loadDriverDashboard(data) {
-            let driverWallet = data.wallet || 0;
-            let tripsCount = data.completedTrips || 0;
-            let starBadge = data.starBadge || false;
-
-            if(driverWallet <= 10) {
-                alert('⚠️ عزيزي السائق، رصيدك منخفض. اطلب كرت شحن عبر مراسلة رقم الإدارة على واتساب: 0913368086');
-            }
-
-            document.getElementById('driverLoginBox').style.display = 'none';
-            document.getElementById('driverRegisterBox').style.display = 'none';
-            document.getElementById('driverAuthSwitchBtns').style.display = 'none';
-            document.getElementById('driverDashboardArea').style.display = 'block';
-            document.getElementById('driverWelcomeName').innerText = data.fullName;
-            document.getElementById('driverGenderDisplay').innerText = currentDriverGender;
-            document.getElementById('driverWalletBalance').innerText = driverWallet;
-            document.getElementById('driverTripsCount').innerText = tripsCount;
-            document.getElementById('driverBadgeBox').innerHTML = starBadge ? '⭐ (الكابتن الحائز على النجمة لإنجازه 30 رحلة)' : '';
-
-            const stmtDiv = document.getElementById('driverPersonalStatement');
-            if(data.statement && data.statement.length > 0) {
-                let stmtHtml = '<ul style="padding-right: 15px;">';
-                data.statement.slice(-5).reverse().forEach(st => {
-                    stmtHtml += `<li>${st.time}:${st.text}</li>`;
-                });
-                stmtHtml += '</ul>';
-                stmtDiv.innerHTML = stmtHtml;
-            } else {
-                stmtDiv.innerHTML = 'لا توجد معاملات مالية مسجلة بعد.';
-            }
+            let hint = document.getElementById('loginHint');
+            let userLbl = document.getElementById('lblUser');
             
-            db.ref('orders').on('value', snap => {
-                const listDiv = document.getElementById('driversOrdersList');
-                const historyDiv = document.getElementById('driverTripHistoryList');
-                const orders = snap.val();
-                listDiv.innerHTML = ''; historyDiv.innerHTML = '';
-                if(!orders) { listDiv.innerHTML = '<p>لا توجد طلبات متاحة.</p>'; return; }
+            if(portalType === 'student') {
+                userLbl.innerText = "رقم القيد:";
+                hint.innerHTML = "أدخل رقم القيد. <b>كلمة المرور الافتراضية هي تاريخ ميلادك (مثال: 2005-05-12)</b>";
+            } else if(portalType === 'employee') {
+                userLbl.innerText = "اسم المستخدم للموظف:";
+                hint.innerHTML = "اسم المستخدم الافتراضي: <code>emp1</code> | كلمة المرور: <code>1234</code>";
+            } else if(portalType === 'faculty') {
+                userLbl.innerText = "اسم مستخدم الأستاذ:";
+                hint.innerHTML = "مثال: <code>prof_acc</code> (للمحاسبة) أو <code>prof_it</code> (لتقنية المعلومات) | كلمة المرور: <code>1234</code>";
+            } else if(portalType === 'admin') {
+                userLbl.innerText = "اسم مستخدم الإدارة:";
+                hint.innerHTML = "اسم المستخدم: <code>admin</code> | كلمة المرور: <code>admin123</code>";
+            }
 
-                let currentOrderCount = Object.keys(orders).length;
-                if(currentOrderCount > lastKnownOrderCount && lastKnownOrderCount !== 0) {
-                    playBeepSoundAndNotify("رحلة جديدة متوفرة في النظام!");
-                }
-                lastKnownOrderCount = currentOrderCount;
+            document.getElementById('portalUser').value = '';
+            document.getElementById('portalPass').value = '';
 
-                Object.keys(orders).forEach(k => {
-                    let ord = orders[k];
-                    
-                    let isTransportService = (ord.serviceType === 'طلب سيارة نقل');
-                    let isTaxiOrDelivery = (ord.serviceType === 'توصيل ركاب (تكسي)' || ord.serviceType === 'توصيل طلبات');
-                    let isFemaleOrder = (ord.genderType === 'انثى');
-                    let isDriverFemale = (currentDriverGender === 'انثى');
-
-                    let canSeeOrder = false;
-                    if (ord.status === 'قيد الانتظار') {
-                        if (isTransportService) {
-                            canSeeOrder = true;
-                        } else if (isTaxiOrDelivery && isFemaleOrder && isDriverFemale) {
-                            canSeeOrder = true;
-                        } else if (isTaxiOrDelivery && !isFemaleOrder && !isDriverFemale) {
-                            canSeeOrder = true;
-                        }
-                    }
-
-                    if(canSeeOrder && driverWallet > 10) {
-                        listDiv.innerHTML += `<div class="driver-order-item"><p><b>${ord.serviceType}</b> (${ord.genderType}) | من ${ord.pickupLocation} إلى ${ord.dropoffLocation}</p>` +
-                                             `<p>السعر المحدد: <b style="color:var(--primary); font-size: 1rem;">${ord.price}</b> \vert{} الدفع: <b>${ord.paymentMethod}</b></p>` +
-                                             `<button class="btn btn-success" style="margin-top:6px; padding:6px;" onclick="acceptOrder('${k}')">قبول الطلب</button></div>`;
-                    }
-
-                    if(ord.driverPhone === currentDriverPhone) {
-                        let isDone = ord.status === 'مكتملة';
-                        historyDiv.innerHTML += `<div class="driver-order-item"><p><b>${ord.serviceType}</b> | السعر: <b style="color:var(--primary);">${ord.price}</b></p>` +
-                                                 `<p>الزبون: <b>${ord.clientName}</b> | هاتف: <a href="tel:${ord.clientPhone}" style="color:var(--primary); font-weight:bold;">${ord.clientPhone} <i class="fa-solid fa-phone"></i></a></p>` +
-                                                 `<p>الدفع: <b>${ord.paymentMethod}</b> | الحالة: <span style="color:${isDone?'green':'orange'}; font-weight:bold;">${ord.status}</span></p>` +
-                                                 (!isDone ? `<p style="font-size: 0.8rem; color: #d97706; margin-top:5px;"><i class="fa-solid fa-info-circle"></i> في انتظار قيام الزبون بالضغط على زر "تم التوصيل بنجاح" لإتمام الرحلة رسمياً.</p>` : ``) +
-                                                 `</div>`;
-                    }
-                });
-            });
+            document.getElementById('mainContainer').style.display = 'none';
+            hideAllPages();
+            document.getElementById('portalLoginWrapper').style.display = 'block';
+            window.scrollTo(0, 0);
         }
 
-        document.getElementById('shareLocationBtn').addEventListener('click', () => {
-            if (!navigator.geolocation) { alert("متصفحك لا يدعم تحديد الموقع."); return; }
-            navigator.geolocation.watchPosition((pos) => {
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
-                const mapUrl = `https://maps.google.com/?q=${lat},${lon}`;
-                if(currentDriverPhone) {
-                    db.ref('drivers/' + currentDriverPhone + '/location').set(mapUrl);
-                }
-            }, (err) => console.log(err), { enableHighAccuracy: true });
-            alert("📍 تم تفعيل ومشاركة موقعك الحي مع الزبون.");
-        });
+        function verifyPortalLogin() {
+            let user = document.getElementById('portalUser').value.trim();
+            let pass = document.getElementById('portalPass').value.trim();
 
-        window.acceptOrder = (id) => {
-            db.ref('drivers/' + currentDriverPhone).once('value').then(snap => {
-                if((snap.val().wallet || 0) <= 10) {
-                    alert('❌ عذراً، رصيدك 10 دينار أو أقل. اطلب كرت شحن بمراسلة واتساب: 0913368086');
-                    return;
-                }
-                db.ref('orders/' + id).update({ status: 'مقبولة وتوصيل', driverPhone: currentDriverPhone }).then(() => {
-                    addRevenue(1, `عمولة قبول رحلة من السائق ${currentDriverPhone}`);
-                    alert('✅ تم قبول الطلب بنجاح وتم تسجيل العمولة للنظام.');
-                });
-            });
-        };
-
-        // تسجيل دخول الإدارة مع دعم التغيير المخصص للرقم السري
-        document.getElementById('adminLoginBtn').addEventListener('click', () => {
-            const user = document.getElementById('adminUsernameInput').value.trim();
-            const pass = document.getElementById('adminPinInput').value.trim();
-
-            db.ref('admin_settings/custom_pin').once('value').then(pinSnap => {
-                let actualAdminPin = pinSnap.val() || '1234';
-
-                if(user === 'admin' && pass === actualAdminPin) {
-                    openAdminPanel();
+            if(currentActivePortal === 'student') {
+                let student = dbStudents.find(s => s.stID === user);
+                if(student && student.dob === pass) {
+                    loggedInStudent = student;
+                    hideAllPages();
+                    loadStudentProfilePortal();
+                    document.getElementById('studentPage').style.display = 'block';
+                    window.scrollTo(0, 0);
                 } else {
-                    db.ref('sub_admins/' + user).once('value').then(snap => {
-                        if(snap.val() && snap.val().pass === pass) {
-                            openAdminPanel();
-                        } else {
-                            alert('بيانات الدخول غير صحيحة.');
-                        }
-                    });
+                    alert('رقم القيد أو تاريخ الميلاد (كلمة المرور) غير صحيح.');
                 }
-            });
-        });
-
-        function openAdminPanel() {
-            document.getElementById('adminLoginBox').style.display = 'none';
-            document.getElementById('adminContentPanel').style.display = 'block';
-            loadAdminPanelData();
+            } else if(currentActivePortal === 'employee') {
+                if((user === "emp1" || user === "employee") && pass === "1234") {
+                    loggedInEmployee = user;
+                    hideAllPages();
+                    document.getElementById('empWelcomeTitle').innerText = `بوابة الموظفين (${user}) - تسجيل الطلاب والرسوم`;
+                    document.getElementById('employeePage').style.display = 'block';
+                    window.scrollTo(0, 0);
+                } else {
+                    alert('بيانات دخول الموظف خاطئة.');
+                }
+            } else if(currentActivePortal === 'faculty') {
+                if(facultyAccounts[user] && pass === "1234") {
+                    loggedInFacultyKey = user;
+                    hideAllPages();
+                    let prof = facultyAccounts[user];
+                    document.getElementById('facultyDashboardTitle').innerText = `بوابة عضو هيئة التدريس: ${prof.name} (${departmentsData[prof.dept].title})`;
+                    populateFacultySubjectsForProf();
+                    document.getElementById('facultyPage').style.display = 'block';
+                    window.scrollTo(0, 0);
+                } else {
+                    alert('اسم مستخدم الأستاذ أو كلمة المرور غير صحيحة.');
+                }
+            } else if(currentActivePortal === 'admin') {
+                if(user === "admin" && pass === "admin123") {
+                    hideAllPages();
+                    loadAdminAuditLogs();
+                    document.getElementById('adminPage').style.display = 'block';
+                    window.scrollTo(0, 0);
+                } else {
+                    alert('بيانات دخول الإدارة خاطئة');
+                }
+            }
         }
 
-        document.getElementById('saveRoutePriceBtn').addEventListener('click', () => {
-            const pickup = document.getElementById('pricingPickup').value;
-            const dropoff = document.getElementById('pricingDropoff').value;
-            const amount = parseFloat(document.getElementById('pricingAmount').value);
+        function loadStudentProfilePortal() {
+            if(!loggedInStudent) return;
+            let deptObj = departmentsData[loggedInStudent.dept];
+            let profileDiv = document.getElementById('studentHeaderProfile');
+            profileDiv.innerHTML = `
+                <h3 style="color:#0b2545; margin-bottom:10px;">بيانات الطالب الشخصية والأكاديمية</h3>
+                <p><b>اسم الطالب:</b> ${loggedInStudent.name}</p>
+                <p><b>رقم القيد:</b> ${loggedInStudent.stID}</p>
+                <p><b>القسم / الكلية:</b> ${deptObj ? deptObj.title : loggedInStudent.dept}</p>
+                <p><b>المجموعة الدراسية:</b> ${loggedInStudent.group || 'غير محدد'}</p>
+                <p><b>تاريخ الميلاد:</b> ${loggedInStudent.dob}</p>
+                <p><b>قيمة الرسوم:</b> ${loggedInStudent.fee} د.ل</p>
+            `;
+            document.getElementById('studentLoggedInResultDisplay').innerHTML = '';
+        }
 
-            if(isNaN(amount) || amount <= 0) { alert('أدخل سعراً صحيحاً.'); return; }
+        function checkStudentLoggedInRecord() {
+            if(!loggedInStudent) return;
+            let disp = document.getElementById('studentLoggedInResultDisplay');
+            let canView = (loggedInStudent.paidStatus === 'paid') || (loggedInStudent.paidStatus === 'installment' && loggedInStudent.installmentApproved === 'yes');
 
-            let routeKey = `${pickup}_to_${dropoff}`;
-            db.ref('route_prices/' + routeKey).set({ pickup, dropoff, price: amount }).then(() => {
-                alert(`✅ تم حفظ السعر للمسار (${pickup} ➔ ${dropoff}) بنجاح!`);
-                document.getElementById('pricingAmount').value = '';
-                logAdminAction(`تحديد سعر المسار ${pickup} إلى ${dropoff} بقيمة ${amount} د.ل`);
-            });
-        });
-
-        function loadAdminPricingTable() {
-            const div = document.getElementById('adminSavedPricingTable');
-            if(!div) return;
-            div.innerHTML = '';
-            if(Object.keys(globalRoutesPricing).length === 0) {
-                div.innerHTML = '<p style="font-size:0.8rem;">لا توجد مسارات مسعرة بعد.</p>';
+            if(!canView) {
+                disp.innerHTML = `<div style="background:#fff3cd; color:#856404; padding:15px; border:1px solid #ffeeba; border-radius:6px; margin-top:15px;">
+                    <h4 style="margin-bottom:5px;">عذراً، لا يمكن عرض النتيجة</h4>
+                    <p>النتيجة محجوبة لعدم السداد الكامل أو عدم اعتماد الإدارة لنظام الأقساط.</p>
+                </div>`;
                 return;
             }
 
-            let html = '<table class="data-table"><tr><th>من</th><th>إلى</th><th>السعر</th><th>إجراء</th></tr>';
-            Object.keys(globalRoutesPricing).forEach(key => {
-                let r = globalRoutesPricing[key];
-                html += `<tr><td>${r.pickup}</td><td>${r.dropoff}</td><td><b>${r.price} د.ل</b></td>` +
-                        `<td><button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="deleteRoutePrice('${key}')">حذف</button></td></tr>`;
-            });
-            div.innerHTML = html + '</table>';
+            let gradesRows = '';
+            if(loggedInStudent.grades && loggedInStudent.grades.length > 0) {
+                loggedInStudent.grades.forEach((g, i) => {
+                    gradesRows += `<tr><td>${i+1}</td><td>${g.subject}</td><td>${g.coursework}</td><td>${g.finalexam}</td><td style="font-weight:bold;">${g.total}</td><td style="font-weight:bold; color:#16a34a;">${g.gradeLetter}</td></tr>`;
+                });
+            } else {
+                gradesRows = `<tr><td colspan="6" style="color:#666;">لم يتم رصد درجات حتى الآن.</td></tr>`;
+            }
+
+            disp.innerHTML = `<div style="margin-top:15px;"><h4 style="color:#0b2545; margin-bottom:10px;">تفاصيل الدرجات وأعمال السنة:</h4><table><thead><tr><th>م</th><th>اسم المقرر</th><th>أعمال السنة (40)</th><th>النهائي (60)</th><th>المجموع (100)</th><th>التقدير</th></tr></thead><tbody>${gradesRows}</tbody></table></div>`;
         }
 
-        window.deleteRoutePrice = (key) => {
-            if(confirm('هل أنت متأكد من الحذف؟')) {
-                db.ref('route_prices/' + key).remove().then(() => logAdminAction(`حذف تسعير المسار ${key}`));
-            }
-        };
-
-        document.getElementById('factoryResetBtn').addEventListener('click', () => {
-            if(confirm('⚠️ تحذير خطير: هل أنت متأكد تماماً من رغبتك في تصفير التطبيق بالكامل؟')) {
-                if(confirm('تأكيد نهائي: سيتم مسح كافة البيانات والسجلات، هل أنت متأكد؟')) {
-                    db.ref().remove().then(() => {
-                        alert('✅ تم تصفير وإعادة ضبط المنظومة.');
-                        location.reload();
-                    });
-                }
-            }
-        });
-
-        document.getElementById('generateBatchCardsBtn').addEventListener('click', () => {
-            const prefix = document.getElementById('batchPrefix').value.trim() || 'WAS';
-            const count = parseInt(document.getElementById('batchCount').value) || 10;
-            const val = parseFloat(document.getElementById('batchValue').value) || 20;
-            let createdAt = Date.now();
-
-            for(let i = 1; i <= count; i++) {
-                let code = `${prefix}-${Math.floor(1000 + Math.random() * 9000)}`;
-                db.ref('cards/' + code).set({ value: val, used: false, createdAt: createdAt });
-            }
-            alert(`✅ تم إنشاء دفعة من ${count} كروت بقيمة ${val} د.ل (صالحة 30 يوم) بنجاح.`);
-            logAdminAction(`إنشاء دفعة كروت ${count} كرت بقيمة ${val} د.ل`);
-        });
-
-        window.approveRegistration = (type, phone, data) => {
-            let targetPath = (type === 'زبون') ? 'clients/' + phone : 'drivers/' + phone;
-            db.ref(targetPath).set(data).then(() => {
-                db.ref('pending_registrations/' + (type === 'زبون' ? 'clients' : 'drivers') + '/' + phone).remove().then(() => {
-                    alert(`✅ تم اعتماد تسجيل ${type} (${phone}) بنجاح.`);
-                    logAdminAction(`اعتماد تسجيل ${type}: ${phone}`);
-                });
+        function hideAllPages() {
+            ['departmentPage', 'dynamicPage', 'newsPage', 'portalLoginWrapper', 'studentPage', 'employeePage', 'facultyPage', 'adminPage'].forEach(p => {
+                document.getElementById(p).style.display = 'none';
             });
-        };
+        }
 
-        window.rejectRegistration = (type, phone) => {
-            if(confirm('هل أنت متأكد من رفض وحذف طلب التسجيل؟')) {
-                db.ref('pending_registrations/' + (type === 'زبون' ? 'clients' : 'drivers') + '/' + phone).remove().then(() => {
-                    alert('✅ تم رفض الطلب وحذفه.');
-                    logAdminAction(`رفض تسجيل ${type}: ${phone}`);
-                });
-            }
-        };
+        function showMainHome() {
+            hideAllPages();
+            document.getElementById('mainContainer').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
 
-        window.deleteClient = (phone) => {
-            if(confirm(`هل أنت متأكد من حذف الزبون رقم ${phone}؟`)) {
-                db.ref('clients/' + phone).remove().then(() => {
-                    alert('✅ تم حذف الزبون بنجاح.');
-                    logAdminAction(`حذف الزبون ${phone}`);
+        function scrollToSection(id) {
+            showMainHome();
+            setTimeout(() => document.getElementById(id).scrollIntoView({ behavior: 'smooth' }), 100);
+        }
+
+        function openDepartment(deptKey) {
+            let dept = departmentsData[deptKey];
+            if(!dept) return;
+            document.getElementById('deptTitle').innerText = dept.title;
+            document.getElementById('deptDesc').innerText = dept.desc;
+            let tbody = document.getElementById('coursesTableBody');
+            tbody.innerHTML = '';
+            dept.courses.forEach((c, idx) => {
+                tbody.innerHTML += `<tr><td>${idx+1}</td><td>${c.code}</td><td>${c.name}</td></tr>`;
+            });
+            document.getElementById('mainContainer').style.display = 'none';
+            hideAllPages();
+            document.getElementById('departmentPage').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        function openNewsPage() {
+            document.getElementById('mainContainer').style.display = 'none';
+            hideAllPages();
+            let container = document.getElementById('newsListContainer');
+            container.innerHTML = '';
+            if(newsList.length === 0) {
+                container.innerHTML = `<p>لا توجد أخبار منشورة حالياً.</p>`;
+            } else {
+                newsList.slice().reverse().forEach(n => {
+                    container.innerHTML += `<div style="background:#f8f9fa; padding:20px; border-radius:6px; margin-bottom:15px; border-right:4px solid #0b2545;">
+                        <h4 style="color:#0b2545; margin-bottom:5px;">${n.title}</h4>
+                        <span style="font-size:12px; color:#666;">📅 ${n.date}</span>
+                        <p style="margin-top:10px; line-height:1.6; color:#333;">${n.body}</p>
+                    </div>`;
                 });
             }
-        };
+            document.getElementById('newsPage').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
 
-        window.deleteDriver = (phone) => {
-            if(confirm(`هل أنت متأكد من حذف السائق رقم ${phone}؟`)) {
-                db.ref('drivers/' + phone).remove().then(() => {
-                    alert('✅ تم حذف السائق بنجاح.');
-                    logAdminAction(`حذف السائق ${phone}`);
+        function openDynamicPage(pageType) {
+            document.getElementById('mainContainer').style.display = 'none';
+            hideAllPages();
+            let titleEl = document.getElementById('dynTitle');
+            let bodyEl = document.getElementById('dynBody');
+            if(pageType === 'programs') {
+                titleEl.innerText = "البرامج الدراسية الأكاديمية";
+                bodyEl.innerHTML = `<ul style="margin-right:20px; list-style-type:disc; line-height:2;"><li><b>كلية المحاسبة:</b> بكالوريوس المحاسبة العامة والمراجعة.</li><li><b>كلية الإدارة والأعمال:</b> بكالوريوس إدارة الأعمال.</li><li><b>كلية القانون:</b> بكالوريوس العلوم القانونية.</li><li><b>قسم تقنية المعلومات:</b> بكالوريوس تقنية المعلومات.</li></ul>`;
+            } else if(pageType === 'contact') {
+                titleEl.innerText = "اتصل بنا";
+                bodyEl.innerHTML = `<p><b>العنوان:</b> سبها - ليبيا</p><p><b>البريد الإلكتروني:</b> info@manara.edu.ly</p>`;
+            } else {
+                titleEl.innerText = "الأدلة والإجراءات";
+                bodyEl.innerHTML = `<p>تنظم اللوائح الداخلية شروط القبول والتسجيل.</p>`;
+            }
+            document.getElementById('dynamicPage').style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+
+        function employeeRegisterStudent() {
+            let name = document.getElementById('empStName').value.trim();
+            let stID = document.getElementById('empStID').value.trim();
+            let dob = document.getElementById('empStDOB').value;
+            let dept = document.getElementById('empStDept').value;
+            let group = document.getElementById('empStGroup').value.trim() || "المجموعة العامة";
+            let fee = parseFloat(document.getElementById('empStFee').value) || 0;
+
+            if(!name || !stID) { alert('املأ كافة الحقول الأساسية'); return; }
+
+            dbStudents.push({ name, stID, dob, dept, group, fee, paidStatus: 'unpaid', installmentApproved: 'no', grades: [] });
+            logAction(loggedInEmployee || 'emp1', 'إضافة طالب جديد', `إضافة الطالب ${name} (رقم القيد: ${stID}) في قسم ${dept} - مجموعة: ${group}`);
+            alert('تم تسجيل الطالب وإنشاء حسابه بنجاح.');
+            document.getElementById('empStName').value = '';
+            document.getElementById('empStID').value = '';
+        }
+
+        function updatePaymentStatus() {
+            let stID = document.getElementById('payStID').value.trim();
+            let paidStatus = document.getElementById('payStatus').value;
+            let installmentApproved = document.getElementById('payInstallmentApproval').value;
+
+            let student = dbStudents.find(s => s.stID === stID);
+            if(!student) { alert('رقم القيد غير موجود'); return; }
+
+            student.paidStatus = paidStatus;
+            student.installmentApproved = installmentApproved;
+            logAction(loggedInEmployee || 'emp1', 'تعديل الحالة المالية', `تحديث الرسوم للطالب ${student.name} (قيد: ${stID}) إلى حالة: ${paidStatus} - موافقة أقساط: ${installmentApproved}`);
+            saveData();
+            alert('تم تحديث الشؤون المالية ونظام الأقساط بنجاح.');
+        }
+
+        function populateFacultySubjectsForProf() {
+            if(!loggedInFacultyKey) return;
+            let prof = facultyAccounts[loggedInFacultyKey];
+            let subSelect = document.getElementById('facSubjectSelect');
+            subSelect.innerHTML = '';
+            
+            // إضافة المقررات الافتراضية والجديدة المضافة للقسم
+            let deptCourses = departmentsData[prof.dept].courses.map(c => c.name);
+            deptCourses.forEach(sub => {
+                subSelect.innerHTML += `<option value="${sub}">${sub}</option>`;
+            });
+            populateGroupsForSubject();
+        }
+
+        function populateGroupsForSubject() {
+            if(!loggedInFacultyKey) return;
+            let prof = facultyAccounts[loggedInFacultyKey];
+            let groupSelect = document.getElementById('facGroupSelect');
+            groupSelect.innerHTML = '';
+
+            let deptStudents = dbStudents.filter(s => s.dept === prof.dept);
+            let groupsSet = [...new Set(deptStudents.map(s => s.group || 'المجموعة العامة'))];
+
+            if(groupsSet.length === 0) {
+                groupSelect.innerHTML = `<option value="">لا توجد مجموعات مقيدة لهذا القسم</option>`;
+            } else {
+                groupsSet.forEach(g => {
+                    groupSelect.innerHTML += `<option value="${g}">${g}</option>`;
                 });
             }
-        };
+            loadStudentsForGroupAndSubject();
+        }
 
-        function loadAdminPanelData() {
-            db.ref('system_revenues').on('value', snap => {
-                const disp = document.getElementById('adminTotalRevenueDisplay');
-                if(disp) disp.innerText = (snap.val() || 0) + ' د.ل';
+        function loadStudentsForGroupAndSubject() {
+            if(!loggedInFacultyKey) return;
+            let prof = facultyAccounts[loggedInFacultyKey];
+            let selectedGroup = document.getElementById('facGroupSelect').value;
+            let stSelect = document.getElementById('facStIDSelect');
+            stSelect.innerHTML = '';
+
+            let filtered = dbStudents.filter(s => s.dept === prof.dept && (s.group || 'المجموعة العامة') === selectedGroup);
+            if(filtered.length === 0) {
+                stSelect.innerHTML = `<option value="">لا يوجد طلاب في هذه المجموعة</option>`;
+                return;
+            }
+
+            filtered.forEach(s => {
+                stSelect.innerHTML += `<option value="${s.stID}">${s.stID} - ${s.name}</option>`;
             });
+        }
 
-            db.ref('revenue_transactions').on('value', snap => {
-                const div = document.getElementById('adminRevenueDetailsTable');
-                const data = snap.val();
-                if(!div) return;
-                div.innerHTML = '';
-                if(!data) { div.innerHTML = '<p style="font-size:0.85rem;">لا توجد عمليات إيرادات مسجلة بعد.</p>'; return; }
-                let html = '<table class="data-table"><tr><th>التوقيت</th><th>وصف العملية</th><th>المبلغ</th></tr>';
-                Object.keys(data).reverse().forEach(k => {
-                    let tx = data[k];
-                    html += `<tr><td>${tx.time}</td><td>${tx.description}</td><td><b style="color:#047857;">+${tx.amount} د.ل</b></td></tr>`;
-                });
-                div.innerHTML = html + '</table>';
-            });
+        function saveDetailedGrade() {
+            let stID = document.getElementById('facStIDSelect').value;
+            let subject = document.getElementById('facSubjectSelect').value;
+            let coursework = parseFloat(document.getElementById('facCourseWork').value) || 0;
+            let finalexam = parseFloat(document.getElementById('facFinalExam').value) || 0;
 
-            // كشف المشرفين المساعدين في لوحة الإدارة
-            db.ref('sub_admins').on('value', snap => {
-                const div = document.getElementById('adminSubAdminsTable');
-                const data = snap.val();
-                if(!div) return;
-                div.innerHTML = '';
-                if(!data) { div.innerHTML = '<p style="font-size:0.85rem;">لا توجد مشرفون فرعيون مضافون.</p>'; return; }
-                let html = '<table class="data-table"><tr><th>اسم المشرف</th><th>إجراء الحذف</th></tr>';
-                Object.keys(data).forEach(username => {
-                    html += `<tr><td><b>${username}</b></td><td><button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="deleteSubAdmin('${username}')">حذف المشرف</button></td></tr>`;
-                });
-                div.innerHTML = html + '</table>';
-            });
+            let student = dbStudents.find(s => s.stID === stID);
+            if(!student) { alert('الرجاء اختيار طالب صحيح'); return; }
 
-            db.ref('pending_registrations').on('value', snap => {
-                const div = document.getElementById('adminPendingRegistrationsList');
-                const data = snap.val();
-                if(!div) return;
-                div.innerHTML = '';
-                if(!data) { div.innerHTML = '<p style="font-size:0.85rem;">لا توجد طلبات تسجيل معلقة.</p>'; return; }
+            let total = coursework + finalexam;
+            let gradeLetter = 'رسب';
+            if(total >= 90) gradeLetter = 'أ (امتياز)';
+            else if(total >= 80) gradeLetter = 'ب+ (جيد جداً)';
+            else if(total >= 70) gradeLetter = 'ب (جيد)';
+            else if(total >= 60) gradeLetter = 'ج (مقبول)';
+            else gradeLetter = 'ضعيف';
 
-                let html = '<table class="data-table"><tr><th>النوع</th><th>الاسم</th><th>الهاتف</th><th>المستندات والصور المرفوعة (محفوظة)</th><th>الإجراء</th></tr>';
-                let hasAny = false;
+            if(!student.grades) student.grades = [];
+            let existingIdx = student.grades.findIndex(g => g.subject === subject);
+            if(existingIdx >= 0) {
+                student.grades[existingIdx] = { subject, coursework, finalexam, total, gradeLetter };
+            } else {
+                student.grades.push({ subject, coursework, finalexam, total, gradeLetter });
+            }
 
-                if(data.clients) {
-                    Object.keys(data.clients).forEach(phone => {
-                        let c = data.clients[phone];
-                        hasAny = true;
-                        let jsonStr = JSON.stringify(c).replace(/"/g, '&quot;');
-                        html += `<tr><td>زبون</td><td>${c.name}</td><td>${phone}</td><td>هوية: ${c.idNumber} (${c.idPlace})</td>` +
-                                `<td><button class="btn btn-success" style="padding:2px 5px; font-size:0.7rem;" onclick="approveRegistration('زبون', '${phone}', ${jsonStr})">موافقة</button> ` +
-                                `<button class="btn btn-danger" style="padding:2px 5px; font-size:0.7rem;" onclick="rejectRegistration('زبون', '${phone}')">رفض</button></td></tr>`;
-                    });
-                }
+            logAction(loggedInFacultyKey, 'رصد درجات', `رصد درجات مقرر (${subject}) للطالب ${student.name} (المجموع: ${total}/100 - التقدير: ${gradeLetter})`);
+            saveData();
+            alert(`تم رصد الدرجة بنجاح! المجموع الكلي: ${total}/100 والتقدير: ${gradeLetter}`);
+        }
 
-                if(data.drivers) {
-                    Object.keys(data.drivers).forEach(phone => {
-                        let d = data.drivers[phone];
-                        hasAny = true;
-                        window._pendingDriversCache = window._pendingDriversCache || {};
-                        window._pendingDriversCache[phone] = d;
+        // --- ميزات الإدارة الجديدة ---
+        function adminAddNewCourse() {
+            let deptKey = document.getElementById('adminNewCourseDept').value;
+            let code = document.getElementById('adminNewCourseCode').value.trim();
+            let name = document.getElementById('adminNewCourseName').value.trim();
 
-                        let imgLinks = '';
-                        if(d.carImg) imgLinks += `<button class="btn" style="padding:2px 6px; font-size:0.7rem; background:#0284c7; margin:2px;" onclick="openImageModal(window._pendingDriversCache['${phone}'].carImg, 'صورة السيارة - ${d.fullName}')">[صورة السيارة]</button> `;
-                        if(d.passImg) imgLinks += `<button class="btn" style="padding:2px 6px; font-size:0.7rem; background:#0284c7; margin:2px;" onclick="openImageModal(window._pendingDriversCache['${phone}'].passImg, 'الهوية/الجواز - ${d.fullName}')">[الهوية/الجواز]</button> `;
-                        if(d.bookImg) imgLinks += `<button class="btn" style="padding:2px 6px; font-size:0.7rem; background:#0284c7; margin:2px;" onclick="openImageModal(window._pendingDriversCache['${phone}'].bookImg, 'كتيب المركبة - ${d.fullName}')">[كتيب المركبة]</button>`;
+            if(!code || !name) { alert('أدخل كود المقرر واسمه بنجاح'); return; }
 
-                        html += `<tr><td>سائق</td><td>${d.fullName}</td><td>${phone}</td><td><b>رقم المركبة: ${d.carPlate || '-'}</b><br>هوية: ${d.idNumber}<br>المستندات المحفوظة: ${imgLinks || 'لا توجد'}</td>` +
-                                `<td><button class="btn btn-success" style="padding:2px 5px; font-size:0.7rem;" onclick="approveRegistration('سائق', '${phone}', window._pendingDriversCache['${phone}'])">موافقة</button> ` +
-                                `<button class="btn btn-danger" style="padding:2px 5px; font-size:0.7rem;" onclick="rejectRegistration('سائق', '${phone}')">رفض</button></td></tr>`;
-                    });
-                }
+            if(departmentsData[deptKey]) {
+                departmentsData[deptKey].courses.push({ code, name });
+                logAction("admin", 'إضافة مقرر', `إضافة المقرر الجديد (${code} - ${name}) لقسم ${departmentsData[deptKey].title}`);
+                saveData();
+                alert('تمت إضافة المقرر الجديد وتحديث أقسام الكلية بنجاح!');
+                document.getElementById('adminNewCourseCode').value = '';
+                document.getElementById('adminNewCourseName').value = '';
+            }
+        }
 
-                div.innerHTML = hasAny ? html + '</table>' : '<p style="font-size:0.85rem;">لا توجد طلبات تسجيل معلقة.</p>';
-            });
+        function adminPublishNews() {
+            let title = document.getElementById('adminNewsTitle').value.trim();
+            let body = document.getElementById('adminNewsBody').value.trim();
 
-            db.ref('system_logs').on('value', snap => {
-                const div = document.getElementById('adminSystemLogTable');
-                const data = snap.val();
-                if(!div) return;
-                div.innerHTML = '';
-                if(!data) { div.innerHTML = '<p style="font-size:0.85rem;">لا توجد سجلات بعد.</p>'; return; }
-                let html = '<table class="data-table"><tr><th>التوقيت</th><th>العملية</th></tr>';
-                Object.keys(data).reverse().forEach(k => {
-                    let log = data[k];
-                    html += `<tr><td style="font-size:0.75rem;">${log.time}</td><td>${log.text}</td></tr>`;
-                });
-                div.innerHTML = html + '</table>';
-            });
+            if(!title || !body) { alert('أدخل عنوان ومحتوى الخبر'); return; }
 
-            db.ref('cards').on('value', snap => {
-                const div = document.getElementById('adminCardsListTable');
-                const data = snap.val();
-                if(!div) return;
-                div.innerHTML = '';
-                if(!data) return;
-                let html = '<table class="data-table"><tr><th>الكود</th><th>القيمة</th><th>الحالة</th></tr>';
-                Object.keys(data).forEach(c => {
-                    html += `<tr><td><b>${c}</b></td><td>${data[c].value} د.ل</td><td>${data[c].used ? 'مستخدم' : 'متاح'}</td></tr>`;
-                });
-                div.innerHTML = html + '</table>';
-            });
+            let date = new Date().toISOString().slice(0,10);
+            newsList.push({ title, body, date });
+            logAction("admin", 'نشر خبر', `نشر خبر جديد برأس الصفحة: ${title}`);
+            saveData();
+            alert('تم نشر الخبر بنجاح وظهر تلقائياً في الشريط المتحرك وصفحة الأخبار!');
+            document.getElementById('adminNewsTitle').value = '';
+            document.getElementById('adminNewsBody').value = '';
+        }
 
-            db.ref('clients').on('value', snap => {
-                const div = document.getElementById('adminClientsTable');
-                const data = snap.val();
-                if(!div) return;
-                div.innerHTML = '';
-                if(!data) { div.innerHTML = '<p style="font-size:0.85rem;">لا توجد بيانات.</p>'; return; }
-                let html = '<table class="data-table"><tr><th>الاسم</th><th>الهاتف</th><th>الهوية</th><th>الرحلات</th><th>المحفظة</th><th>حذف</th></tr>';
-                Object.keys(data).forEach(p => {
-                    html += `<tr><td>${data[p].name}</td><td>${p}</td><td>${data[p].idNumber || '-'}</td><td>${data[p].completedTrips || 0}</td><td>${data[p].wallet || 0} د.ل</td>` +
-                            `<td><button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="deleteClient('${p}')">حذف</button></td></tr>`;
-                });
-                div.innerHTML = html + '</table>';
-            });
+        function adminDeleteStudent() {
+            let stID = document.getElementById('adminTargetStID').value.trim();
+            let idx = dbStudents.findIndex(s => s.stID === stID);
+            if(idx === -1) { alert('رقم القيد غير موجود'); return; }
 
-            db.ref('drivers').on('value', snap => {
-                const div = document.getElementById('adminDriversWalletTable');
-                const data = snap.val();
-                if(!div) return;
-                div.innerHTML = '';
-                if(!data) { div.innerHTML = '<p style="font-size:0.85rem;">لا توجد بيانات.</p>'; return; }
-                let html = '<table class="data-table"><tr><th>السائق</th><th>الهاتف</th><th>رقم المركبة</th><th>الرحلات</th><th>الرصيد</th><th>حذف</th></tr>';
-                Object.keys(data).forEach(p => {
-                    let w = data[p].wallet || 0;
-                    let star = data[p].starBadge ? ' ⭐' : '';
-                    let color = w <= 10 ? 'color:red; font-weight:bold;' : 'color:green;';
-                    html += `<tr><td>${data[p].fullName}${star}</td><td>${p}</td><td><b>${data[p].carPlate || '-'}</b></td><td>${data[p].completedTrips || 0}</td><td style="${color}">${w} د.ل</td>` +
-                            `<td><button class="btn btn-danger" style="padding:2px 6px; font-size:0.7rem;" onclick="deleteDriver('${p}')">حذف</button></td></tr>`;
-                });
-                div.innerHTML = html + '</table>';
+            let stName = dbStudents[idx].name;
+            dbStudents.splice(idx, 1);
+            logAction("admin", 'حذف طالب', `حذف الطالب ${stName} برقم قيد ${stID} من النظام`);
+            saveData();
+            alert('تم حذف الطالب من النظام بنجاح.');
+            document.getElementById('adminTargetStID').value = '';
+        }
+
+        function loadAdminAuditLogs() {
+            let tbody = document.getElementById('auditLogsTableBody');
+            tbody.innerHTML = '';
+            if(auditLogs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="color:#666;">لا توجد سجلات تاريخية مسجلة بعد.</td></tr>`;
+                return;
+            }
+            auditLogs.slice().reverse().forEach((log, idx) => {
+                tbody.innerHTML += `<tr>
+                    <td>${idx+1}</td>
+                    <td style="font-weight:bold; color:#0b2545;">${log.employee}</td>
+                    <td><span style="background:#e9c46a; color:#0b2545; padding:3px 8px; border-radius:4px; font-weight:bold; font-size:12px;">${log.action}</span></td>
+                    <td style="text-align:right; padding-right:15px;">${log.details}</td>
+                    <td>${log.time}</td>
+                </tr>`;
             });
         }
     </script>
